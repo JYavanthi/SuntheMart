@@ -1,0 +1,226 @@
+.adm-vw-dscnts-wrapper {
+ background: #f6fff2;
+    padding: 24px 24px;
+    font-family: Arial, sans-serif;
+    border-radius: 20px;
+}
+
+.adm-vw-dscnts-loading {
+  text-align: center;
+  padding: 50px;
+  font-size: 18px;
+  color: #666;
+}
+
+/* Header */
+.adm-vw-dscnts-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.adm-vw-dscnts-icon {
+  font-size: 32px;
+  background: #e8f5e9;
+  padding: 10px;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.adm-vw-dscnts-title {
+  margin: 0;
+  color: #2e7d32;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+/* Container */
+.adm-vw-dscnts-container {
+  background: white;
+  border-radius: 20px;
+  padding: 16px 30px;
+  /* max-width: 800px; */
+  margin: 0 auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border: 2px solid #c8e6c9;
+  padding-top: 26px;
+}
+
+.adm-vw-dscnts-subtitle {
+  margin: 0 0 25px;
+  color: #2e7d32;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+/* Discount List */
+.adm-vw-dscnts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+/* Discount Item */
+.adm-vw-dscnts-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f9fdf9;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 15px 20px;
+  transition: all 0.3s ease;
+}
+
+.adm-vw-dscnts-item:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-color: #66bb6a;
+}
+
+.adm-vw-dscnts-item-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex: 1;
+}
+
+.adm-vw-dscnts-item-icon {
+  font-size: 28px;
+  background: #e8f5e9;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.adm-vw-dscnts-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.adm-vw-dscnts-item-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.adm-vw-dscnts-code {
+  font-weight: 700;
+  color: #2e7d32;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+
+.adm-vw-dscnts-separator {
+  color: #999;
+  font-weight: 300;
+}
+
+.adm-vw-dscnts-description {
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.adm-vw-dscnts-item-detail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adm-vw-dscnts-detail-icon {
+  color: #66bb6a;
+  font-size: 14px;
+  background: #e8f5e9;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.adm-vw-dscnts-detail-text {
+  color: #666;
+  font-size: 13px;
+}
+
+/* Item Right */
+.adm-vw-dscnts-item-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.adm-vw-dscnts-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #2e7d32;
+  min-width: 80px;
+  text-align: right;
+}
+
+.adm-vw-dscnts-edit-btn {
+  background: #66bb6a;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: background 0.3s ease;
+}
+
+.adm-vw-dscnts-edit-btn:hover {
+  background: #4caf50;
+}
+
+/* Apply Button */
+.adm-vw-dscnts-apply-btn {
+  background: #4caf50;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.adm-vw-dscnts-apply-btn:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+}
+
+.adm-vw-dscnts-delete-btn{
+    color: red;
+}
