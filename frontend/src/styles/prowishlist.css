@@ -1,0 +1,296 @@
+.pro-wshlst-page{
+  background:#f7f7f2;
+  min-height:100vh;
+}
+
+.pro-wshlst-banner{
+  position:relative;
+  height:260px;
+  overflow:hidden;
+}
+
+.pro-wshlst-banner-img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.pro-wshlst-overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(255,255,255,0.75);
+}
+
+.pro-wshlst-banner-content{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:40px 60px;
+}
+
+.pro-wshlst-banner-left h1{
+  font-size:48px;
+  color:#222;
+  margin-bottom:16px;
+}
+
+.pro-wshlst-banner-left p{
+  font-size:18px;
+  color:#666;
+  max-width:360px;
+  line-height:1.6;
+}
+
+.pro-wshlst-banner-center img{
+  width:260px;
+  object-fit:contain;
+}
+
+.pro-wshlst-banner-card{
+  width:280px;
+  background:white;
+  padding:24px;
+  border-radius:18px;
+  box-shadow:0 4px 20px rgba(0,0,0,0.08);
+}
+
+.pro-wshlst-banner-card h3{
+  font-size:20px;
+  margin-bottom:12px;
+  color:#2e7d32;
+}
+
+.pro-wshlst-banner-card p{
+  color:#666;
+  line-height:1.6;
+}
+
+.pro-wshlst-main{
+  display:grid;
+  grid-template-columns:280px 1fr;
+  gap:24px;
+  padding:30px 40px;
+}
+
+.pro-wshlst-right{
+  display:flex;
+  flex-direction:column;
+  gap:28px;
+}
+
+.pro-wshlst-top-row{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.pro-wshlst-filters{
+  display:flex;
+  gap:14px;
+}
+
+.pro-wshlst-filters select,
+.pro-wshlst-filters button{
+  height:42px;
+  padding:0 18px;
+  border:1px solid #ddd;
+  border-radius:10px;
+  background:white;
+  cursor:pointer;
+}
+
+.pro-wshlst-section{
+  background:white;
+  border-radius:18px;
+  padding:26px;
+  border:1px solid #eee;
+}
+
+.pro-wshlst-section-top{
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:26px;
+}
+
+.pro-wshlst-section-top h2{
+  font-size:26px;
+  margin-bottom:8px;
+}
+
+.pro-wshlst-section-top p{
+  color:#777;
+}
+
+.pro-wshlst-section-top span{
+  color:#2e7d32;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.pro-wshlst-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:20px;
+}
+
+.pro-wshlst-card{
+  border:1px solid #eee;
+  border-radius:18px;
+  padding:18px;
+  position:relative;
+  transition:0.3s;
+  background:#fff;
+}
+
+.pro-wshlst-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.pro-wshlst-heart{
+  position:absolute;
+  top:16px;
+  right:16px;
+  border:none;
+  background:none;
+  font-size:24px;
+  color:#2e7d32;
+  cursor:pointer;
+}
+
+.pro-wshlst-product-img{
+  width:100%;
+  height:180px;
+  object-fit:contain;
+  margin-bottom:18px;
+  cursor:pointer;
+}
+
+.pro-wshlst-content h3{
+  font-size:18px;
+  margin-bottom:6px;
+}
+
+.pro-wshlst-content p{
+  color:#777;
+  margin-bottom:14px;
+}
+
+.pro-wshlst-price-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.pro-wshlst-price-row h2{
+  color:#2e7d32;
+}
+
+.pro-wshlst-price-row span{
+  background:#e8f5e9;
+  color:#2e7d32;
+  padding:5px 12px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+}
+
+.pro-wshlst-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.pro-wshlst-qty-btn{
+  width:32px;
+  height:32px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  background:white;
+  cursor:pointer;
+}
+
+.pro-wshlst-cart-btn{
+  flex:1;
+  height:38px;
+  border:none;
+  background:#2e7d32;
+  color:white;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:600;
+}
+
+.pro-wshlst-cart-btn.full{
+  width:100%;
+}
+
+.pro-wshlst-empty{
+  text-align:center;
+  padding:60px 20px;
+}
+
+.pro-wshlst-empty img{
+  width:120px;
+  margin-bottom:20px;
+}
+
+.pro-wshlst-empty h3{
+  margin-bottom:10px;
+}
+
+.pro-wshlst-empty p{
+  color:#777;
+  margin-bottom:20px;
+}
+
+.pro-wshlst-empty button{
+  height:46px;
+  padding:0 24px;
+  border:none;
+  background:#2e7d32;
+  color:white;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+@media(max-width:1200px){
+
+  .pro-wshlst-grid{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+}
+
+@media(max-width:992px){
+
+  .pro-wshlst-main{
+    grid-template-columns:1fr;
+  }
+
+  .pro-wshlst-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .pro-wshlst-banner-content{
+    flex-direction:column;
+    gap:20px;
+    text-align:center;
+  }
+
+}
+
+@media(max-width:600px){
+
+  .pro-wshlst-grid{
+    grid-template-columns:1fr;
+  }
+
+  .pro-wshlst-banner-left h1{
+    font-size:34px;
+  }
+
+}

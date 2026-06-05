@@ -479,9 +479,7 @@ display: flex;
   font-size: 14px;
 }
 .ord-dtl-row1{
-  margin-top: 35px;
-  display: flex;
-  justify-content: space-between;
+  margin-top: 35px; 
   margin-bottom: 12px;
   font-size: 14px;
 } 
@@ -499,10 +497,12 @@ display: flex;
 }
 .ord-dtl-row1 .coupon{
       
-    font-size: 16px;
+  font-size: 16px;
     font-weight: 600;
-     color: #a78634;
-      letter-spacing: 0.5px;
+    color: #a78634;
+    letter-spacing: 0.5px;
+    display: flex;
+justify-content: space-between;
       
 
 }
@@ -510,10 +510,7 @@ display: flex;
 .ord-dtl-row1 .code {
       color: #2e7d32;
     font-size: 16px;
-    margin-left: 74px;
     font-weight: 600;
-    text-align: center;
-    align-items: center;
 
 }
 

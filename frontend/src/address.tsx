@@ -1,13 +1,16 @@
 
+
 // import React, { useState, useEffect } from "react";
 // import Navbar from "./Navbar/navbar";
 // import Footer from "./footer";
 // import "./styles/address.css";
-// import { useNavigate } from "react-router-dom";
+// import { useNavigate, useLocation } from "react-router-dom";
 // import { useAddress } from "./context/AddressContext";
 // import AddressFormModal from "./addressFormModal";
-// import { API_URLS } from "../src/API-Urls";
 // import { useCart } from "./context/CartContext";
+// import ProfileSidebar from "./ProfileSidebar";
+
+// import banner from "./assets/cart-bg.jpeg";
 
 // const emptyForm = {
 //   flat: "",
@@ -23,7 +26,11 @@
 // };
 
 // const Address = () => {
+
 //   const navigate = useNavigate();
+
+//   const location = useLocation();
+
 //   const { cartItems } = useCart();
 
 //   const {
@@ -34,28 +41,63 @@
 //     fetchAddresses,
 //   } = useAddress();
 
-//   const [showForm, setShowForm] = useState(false);
-//   const [form, setForm] = useState<any>(emptyForm);
-//   const [editingId, setEditingId] = useState<number | null>(null);
+//   const [showForm, setShowForm] =
+//     useState(false);
 
-//   const userId = Number(localStorage.getItem("userId"));
+//   const [form, setForm] =
+//     useState<any>(emptyForm);
 
-//   /* ================= LOAD ADDRESSES ================= */
+//   const [editingId, setEditingId] =
+//     useState<number | null>(null);
+
+//   const userId = Number(
+//     localStorage.getItem("userId")
+//   );
+
+//   /* =========================
+//      LOAD ADDRESS
+//   ========================= */
+
 //   useEffect(() => {
+
 //     if (userId) {
 //       fetchAddresses(userId);
 //     }
+
+//     if (location.state?.openAddForm) {
+
+//       setEditingId(null);
+
+//       setForm({ ...emptyForm });
+
+//       setShowForm(true);
+
+//     }
+
 //   }, [userId]);
 
-//   /* ================= ADD ADDRESS ================= */
+//   /* =========================
+//      ADD
+//   ========================= */
+
 //   const openAddForm = () => {
+
 //     setEditingId(null);
+
 //     setForm({ ...emptyForm });
+
 //     setShowForm(true);
+
 //   };
 
-//   /* ================= EDIT ADDRESS ================= */
-//   const openEditForm = (item: any) => {
+//   /* =========================
+//      EDIT
+//   ========================= */
+
+//   const openEditForm = (
+//     item: any
+//   ) => {
+
 //     setEditingId(item.id);
 
 //     setForm({
@@ -72,163 +114,355 @@
 //     });
 
 //     setShowForm(true);
+
 //   };
 
-//   /* ================= DELETE ADDRESS ================= */
-//   const handleDelete = async (id: number, e: any) => {
+//   /* =========================
+//      DELETE
+//   ========================= */
+
+//   const handleDelete = async (
+//     id: number,
+//     e: any
+//   ) => {
+
 //     e.stopPropagation();
+
 //     await deleteAddress(id);
 
 //     if (userId) {
 //       fetchAddresses(userId);
 //     }
+
 //   };
-  
-//     const handleDeleteAccount = async () => {
-//       const confirmDelete = window.confirm(
-//         "⚠️ Are you sure you want to delete your account?\nThis action can be recovered later."
-//       );
-  
-//       if (!confirmDelete) return;
-  
-//       try {
-//         const userId = localStorage.getItem("userId");
-  
-//         if (!userId) {
-//           alert("User not found");
-//           return;
-//         }
-  
-//         const res = await fetch(
-//           `${API_URLS.BASE_URL}users/${userId}/delete`,
-//           { method: "PUT" }
-//         );
-  
-//         const data = await res.json();
-  
-//         if (data.success) {
-//           localStorage.clear();
-//           alert("✅ Account deleted successfully");
-//           navigate("/signup");
-//         } else {
-//           alert("❌ Failed to delete account");
-//         }
-  
-//       } catch (error) {
-//         console.error("❌ Delete error:", error);
-//         alert("Server error while deleting account");
-//       }
-//     };
 
 //   return (
 //     <>
 //       <Navbar />
 
-//       <div className="profile-page-1">
-//         <div className="profile-content-add">
+//       <div className="address-page">
 
-//           {/* Sidebar */}
-//           <div className="prfl-sidebar">
-//             <button onClick={() => navigate("/profile")}>MY ORDERS</button>
-//             <button className="active">SAVED ADDRESS</button>
-//             <button onClick={() => navigate("/t&c")}>TERMS & CONDITIONS</button>
-//             <button onClick={() => navigate("/privacy-policy")}>PRIVACY POLICY</button>
-          
-//                <button
-//               className="logout-btn"
-//               onClick={() => {
-//                 const confirmLogout = window.confirm("Do you want to logout?");
-//                 if (confirmLogout) {
-//                   localStorage.clear();
-//                   navigate("/");
-//                 }
-//               }}
-//             >
-//               LOG OUT
-//             </button>
+//         {/* ======================
+//             TOP BANNER
+//         ====================== */}
 
-//             <button className="delete-btn" onClick={handleDeleteAccount}>
-//               DELETE ACCOUNT
-//             </button>
+//         <div className="address-top-banner">
+
+//           <img
+//             src={banner}
+//             alt=""
+//             className="address-banner-img"
+//           />
+
+//           <div className="address-banner-overlay"></div>
+
+//           <div className="address-banner-content">
+
+//             <div className="address-banner-left">
+
+//               <h1>
+//                 My Addresses
+//               </h1>
+
+//               <div className="address-breadcrumb">
+
+//                 Home
+
+//                 <span>›</span>
+
+//                 Addresses
+
+//               </div>
+
+//             </div>
+
+//             <div className="address-banner-right">
+
+//               <div className="address-banner-card">
+
+//                 <div className="address-banner-icon">
+//                   ♡
+//                 </div>
+
+//                 <div>
+
+//                   <h3>
+//                     Manage your addresses
+//                   </h3>
+
+//                   <p>
+//                     Add, edit or remove
+//                     addresses for a smooth
+//                     delivery experience.
+//                   </p>
+
+//                 </div>
+
+//               </div>
+
+//             </div>
+
 //           </div>
 
-//           {/* Address Section */}
-//           <div className="address-section">
-//             <h2>Deliver To</h2>
+//         </div>
 
-//             {addresses.length === 0 && <p>No addresses found</p>}
+//         {/* ======================
+//             MAIN
+//         ====================== */}
+
+//         <div className="address-container">
+
+//           {/* SIDEBAR */}
+
+//           <ProfileSidebar />
+
+//           {/* RIGHT */}
+
+//           <div className="address-right">
+
+//             {/* TOP */}
+
+//             <div className="address-right-top">
+
+//               <div>
+
+//                 <h2>
+//                   Your Saved Addresses
+//                 </h2>
+
+//                 <p>
+//                   Choose an address during
+//                   checkout for faster
+//                   delivery
+//                 </p>
+
+//               </div>
+
+//               <button
+//                 className="address-add-btn"
+//                 onClick={openAddForm}
+//               >
+//                 + Add New Address
+//               </button>
+
+//             </div>
+
+//             {/* ADDRESS LIST */}
 
 //             {addresses.map((item: any) => (
+
 //               <div
 //                 key={item.id}
-//                 className={`address-card ${
-//                   selectedAddress?.id === item.id ? "selected" : ""
+//                 className={`address-card-new ${
+//                   selectedAddress?.id ===
+//                   item.id
+//                     ? "selected"
+//                     : ""
 //                 }`}
-//                 onClick={() => selectAddress(item)}
+//                 onClick={() =>
+//                   selectAddress(item)
+//                 }
 //               >
-//                 <input
-//                   type="radio"
-//                   checked={selectedAddress?.id === item.id}
-//                   readOnly
-//                 />
 
-//                 <div className="address-details">
-//                   <h3>
-//                     {item.name} ({item.type})
-//                   </h3>
-//                   <p>
-//                     No {item.flat}, {item.street}, {item.city},{" "}
-//                     {item.state}, {item.pincode}
-//                   </p>
-//                   <p>{item.mobile}</p>
+//                 {/* LEFT */}
+
+//                 <div className="address-card-left">
+
+//                   <input
+//                     type="radio"
+//                     checked={
+//                       selectedAddress?.id ===
+//                       item.id
+//                     }
+//                     readOnly
+//                   />
+
+//                   <div className="address-icon-wrap">
+
+//                     <div className="address-type-icon">
+
+//                       {item.type ===
+//                       "Home"
+//                         ? "🏠"
+//                         : item.type ===
+//                           "Office"
+//                         ? "💼"
+//                         : "📍"}
+
+//                     </div>
+
+//                   </div>
+
+//                   <div className="address-user-details">
+
+//                     {item.isDefault && (
+//                       <span className="address-default-badge">
+//                         Default
+//                       </span>
+//                     )}
+
+//                     <h3>
+//                       {item.type}
+//                     </h3>
+
+//                     <h4>
+//                       {item.name}
+//                     </h4>
+
+//                     <p>
+//                       {item.flat},{" "}
+//                       {item.street},
+//                     </p>
+
+//                     <p>
+//                       {item.city},{" "}
+//                       {item.state}
+//                       {" - "}
+//                       {item.pincode}
+//                     </p>
+
+//                     <p>
+//                       +91{" "}
+//                       {item.mobile}
+//                     </p>
+
+//                   </div>
+
 //                 </div>
 
-//                 <div className="edt-del">
-//                   {/* EDIT */}
+//                 {/* CENTER */}
+
+//                 <div className="address-card-center">
+
+//                   <div className="address-info-row">
+
+//                     <span>
+//                       Address Type
+//                     </span>
+
+//                     <strong>
+//                       {item.type}
+//                     </strong>
+
+//                   </div>
+
+//                   <div className="address-info-row">
+
+//                     <span>
+//                       Pincode
+//                     </span>
+
+//                     <strong>
+//                       {item.pincode}
+//                     </strong>
+
+//                   </div>
+
+//                   <div className="address-info-row">
+
+//                     <span>
+//                       Phone Number
+//                     </span>
+
+//                     <strong>
+//                       +91{" "}
+//                       {item.mobile}
+//                     </strong>
+
+//                   </div>
+
+//                 </div>
+
+//                 {/* RIGHT */}
+
+//                 <div className="address-card-actions">
+
 //                   <button
-//                     className="add-edit-btn"
+//                     className="address-edit-btn"
 //                     onClick={(e) => {
+
 //                       e.stopPropagation();
+
 //                       openEditForm(item);
+
 //                     }}
 //                   >
-//                     Edit
+//                     ✏ Edit
 //                   </button>
 
-//                   {/* DELETE */}
 //                   <button
-//                     className="add-delete-btn"
-//                     onClick={(e) => handleDelete(item.id, e)}
+//                     className="address-delete-btn"
+//                     onClick={(e) =>
+//                       handleDelete(
+//                         item.id,
+//                         e
+//                       )
+//                     }
 //                   >
-//                     Delete
+//                     🗑 Remove
 //                   </button>
+
 //                 </div>
+
 //               </div>
+
 //             ))}
 
-//                 <button
-//               className="select-continue-btn"
-//               disabled={!selectedAddress || cartItems.length === 0}
-//               onClick={() => navigate("/cart-address")}
+//             {/* SAFE BOX */}
+
+//             <div className="address-safe-box">
+
+//               <div className="address-safe-icon">
+//                 🛡
+//               </div>
+
+//               <div>
+
+//                 <h4>
+//                   Secure & Hassle-free
+//                   Delivery
+//                 </h4>
+
+//                 <p>
+//                   Your addresses are safe
+//                   with us. We ensure
+//                   on-time and secure
+//                   delivery to your
+//                   doorstep.
+//                 </p>
+
+//               </div>
+
+//             </div>
+
+//             {/* CONTINUE */}
+
+//             <button
+//               className="address-continue-btn"
+//               disabled={
+//                 !selectedAddress ||
+//                 cartItems.length === 0
+//               }
+//               onClick={() =>
+//                 navigate("/checkout")
+//               }
 //             >
 //               Select & Continue
 //             </button>
 
-//             {/* ADD NEW */}
-//             <button
-//               className="add-address-btn"
-//               onClick={openAddForm}
-//             >
-//               + Add New Address
-//             </button>
 //           </div>
+
 //         </div>
+
 //       </div>
 
 //       {/* MODAL */}
+
 //       <AddressFormModal
 //         open={showForm}
-//         onClose={() => setShowForm(false)}
+//         onClose={() =>
+//           setShowForm(false)
+//         }
 //         form={form}
 //         setForm={setForm}
 //         userId={userId}
@@ -242,36 +476,24 @@
 
 // export default Address;
 
-
-
-// works paerfect but doesnt navigate to cart-add automtcly
-
 import React, { useState, useEffect } from "react";
 import Navbar from "./Navbar/navbar";
 import Footer from "./footer";
 import "./styles/address.css";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAddress } from "./context/AddressContext";
-import AddressFormModal from "./addressFormModal";
-import { API_URLS } from "../src/API-Urls";
 import { useCart } from "./context/CartContext";
+import ProfileSidebar from "./ProfileSidebar";
+import AddNewAddress from "./AddNewAddress";
 
-const emptyForm = {
-  flat: "",
-  street: "",
-  landmark: "",
-  pincode: "",
-  city: "",
-  state: "",
-  name: "",
-  mobile: "",
-  type: "Home",
-  default: false,
-};
+import banner from "./assets/cart-bg.jpeg";
 
 const Address = () => {
+
   const navigate = useNavigate();
-  const location = useLocation();   // ⭐ added
+
+  const location = useLocation();
+
   const { cartItems } = useCart();
 
   const {
@@ -282,211 +504,395 @@ const Address = () => {
     fetchAddresses,
   } = useAddress();
 
-  const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState<any>(emptyForm);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [showAddNewAddress, setShowAddNewAddress] =
+    useState(false);
 
-  const userId = Number(localStorage.getItem("userId"));
+  const userId = Number(
+    localStorage.getItem("userId")
+  );
 
-  /* ================= LOAD ADDRESSES ================= */
+  /* =========================
+     LOAD ADDRESS
+  ========================= */
+
   useEffect(() => {
+
     if (userId) {
       fetchAddresses(userId);
     }
 
-    /* ⭐ OPEN FORM IF COMING FROM CART PAGE */
-    if (location.state?.openAddForm) {
-      setEditingId(null);
-      setForm({ ...emptyForm });
-      setShowForm(true);
-    }
-
   }, [userId]);
 
-  /* ================= ADD ADDRESS ================= */
+  /* =========================
+     ADD ADDRESS
+  ========================= */
+
   const openAddForm = () => {
-    setEditingId(null);
-    setForm({ ...emptyForm });
-    setShowForm(true);
+
+    setShowAddNewAddress(true);
+
   };
 
-  /* ================= EDIT ADDRESS ================= */
+  /* =========================
+     EDIT ADDRESS
+  ========================= */
+
   const openEditForm = (item: any) => {
-    setEditingId(item.id);
 
-    setForm({
-      flat: item.flat || "",
-      street: item.street || "",
-      landmark: item.landmark || "",
-      pincode: item.pincode || "",
-      city: item.city || "",
-      state: item.state || "",
-      name: item.name || "",
-      mobile: item.mobile || "",
-      type: item.type || "Home",
-      default: item.isDefault || false,
-    });
+    setShowAddNewAddress(true);
 
-    setShowForm(true);
   };
 
-  /* ================= DELETE ADDRESS ================= */
-  const handleDelete = async (id: number, e: any) => {
+  /* =========================
+     DELETE ADDRESS
+  ========================= */
+
+  const handleDelete = async (
+    id: number,
+    e: any
+  ) => {
+
     e.stopPropagation();
+
     await deleteAddress(id);
 
     if (userId) {
       fetchAddresses(userId);
     }
-  };
 
-  const handleDeleteAccount = async () => {
-    const confirmDelete = window.confirm(
-      "⚠️ Are you sure you want to delete your account?\nThis action can be recovered later."
-    );
-
-    if (!confirmDelete) return;
-
-    try {
-      const userId = localStorage.getItem("userId");
-
-      if (!userId) {
-        alert("User not found");
-        return;
-      }
-
-      const res = await fetch(
-        `${API_URLS.BASE_URL}users/${userId}/delete`,
-        { method: "PUT" }
-      );
-
-      const data = await res.json();
-
-      if (data.success) {
-        localStorage.clear();
-        alert("✅ Account deleted successfully");
-        navigate("/signup");
-      } else {
-        alert("❌ Failed to delete account");
-      }
-
-    } catch (error) {
-      console.error("❌ Delete error:", error);
-      alert("Server error while deleting account");
-    }
   };
 
   return (
     <>
       <Navbar />
 
-      <div className="profile-page-1">
-        <div className="profile-content-add">
+      <div className="address-page">
 
-          {/* Sidebar */}
-          <div className="prfl-sidebar">
-            <button onClick={() => navigate("/profile")}>MY ORDERS</button>
-            <button className="active">SAVED ADDRESS</button>
-            <button onClick={() => navigate("/t&c")}>TERMS & CONDITIONS</button>
-            <button onClick={() => navigate("/privacy-policy")}>PRIVACY POLICY</button>
+        {/* ======================
+            TOP BANNER
+        ====================== */}
 
-            <button
-              className="logout-btn"
-              onClick={() => {
-                const confirmLogout = window.confirm("Do you want to logout?");
-                if (confirmLogout) {
-                  localStorage.clear();
-                  navigate("/");
-                }
-              }}
-            >
-              LOG OUT
-            </button>
+        <div className="address-top-banner">
 
-            <button className="delete-btn" onClick={handleDeleteAccount}>
-              DELETE ACCOUNT
-            </button>
-          </div>
+          <img
+            src={banner}
+            alt=""
+            className="address-banner-img"
+          />
 
-          {/* Address Section */}
-          <div className="address-section">
-            <h2>Deliver To</h2>
+          <div className="address-banner-overlay"></div>
 
-            {addresses.length === 0 && <p>No addresses found</p>}
+          <div className="address-banner-content">
 
-            {addresses.map((item: any) => (
-              <div
-                key={item.id}
-                className={`address-card ${
-                  selectedAddress?.id === item.id ? "selected" : ""
-                }`}
-                onClick={() => selectAddress(item)}
-              >
-                <input
-                  type="radio"
-                  checked={selectedAddress?.id === item.id}
-                  readOnly
-                />
+            <div className="address-banner-left">
 
-                <div className="address-details">
-                  <h3>
-                    {item.name} ({item.type})
-                  </h3>
-                  <p>
-                    No {item.flat}, {item.street}, {item.city},{" "}
-                    {item.state}, {item.pincode}
-                  </p>
-                  <p>{item.mobile}</p>
-                </div>
+              <h1>
+                My Addresses
+              </h1>
 
-                <div className="edt-del">
-                  <button
-                    className="add-edit-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditForm(item);
-                    }}
-                  >
-                    Edit
-                  </button>
+              <div className="address-breadcrumb">
 
-                  <button
-                    className="add-delete-btn"
-                    onClick={(e) => handleDelete(item.id, e)}
-                  >
-                    Delete
-                  </button>
-                </div>
+                Home
+
+                <span>›</span>
+
+                Addresses
+
               </div>
-            ))}
 
-            <button
-              className="select-continue-btn"
-              disabled={!selectedAddress || cartItems.length === 0}
-              onClick={() => navigate("/cart-address")}
-            >
-              Select & Continue
-            </button>
+            </div>
 
-            {/* ADD NEW */}
-            <button
-              className="add-address-btn"
-              onClick={openAddForm}
-            >
-              + Add New Address
-            </button>
+            <div className="address-banner-right">
+
+              <div className="address-banner-card">
+
+                <div className="address-banner-icon">
+                  ♡
+                </div>
+
+                <div>
+
+                  <h3>
+                    Manage your addresses
+                  </h3>
+
+                  <p>
+                    Add, edit or remove
+                    addresses for a smooth
+                    delivery experience.
+                  </p>
+
+                </div>
+
+              </div>
+
+            </div>
+
           </div>
-        </div>
-      </div>
 
-      <AddressFormModal
-        open={showForm}
-        onClose={() => setShowForm(false)}
-        form={form}
-        setForm={setForm}
-        userId={userId}
-        editingId={editingId}
-      />
+        </div>
+
+        {/* ======================
+            MAIN
+        ====================== */}
+
+        <div className="address-container">
+
+          {/* SIDEBAR */}
+
+          <ProfileSidebar />
+
+          {/* RIGHT */}
+
+          <div className="address-right">
+
+            {!showAddNewAddress ? (
+
+              <>
+                {/* TOP */}
+
+                <div className="address-right-top">
+
+                  <div>
+
+                    <h2>
+                      Your Saved Addresses
+                    </h2>
+
+                    <p>
+                      Choose an address during
+                      checkout for faster
+                      delivery
+                    </p>
+
+                  </div>
+
+                  <button
+                    className="address-add-btn"
+                    onClick={openAddForm}
+                  >
+                    + Add New Address
+                  </button>
+
+                </div>
+
+                {/* ADDRESS LIST */}
+
+                {addresses.map((item: any) => (
+
+                  <div
+                    key={item.id}
+                    className={`address-card-new ${
+                      selectedAddress?.id ===
+                      item.id
+                        ? "selected"
+                        : ""
+                    }`}
+                    onClick={() =>
+                      selectAddress(item)
+                    }
+                  >
+
+                    {/* LEFT */}
+
+                    <div className="address-card-left">
+
+                      <input
+                        type="radio"
+                        checked={
+                          selectedAddress?.id ===
+                          item.id
+                        }
+                        readOnly
+                      />
+
+                      <div className="address-icon-wrap">
+
+                        <div className="address-type-icon">
+
+                          {item.type ===
+                          "Home"
+                            ? "🏠"
+                            : item.type ===
+                              "Office"
+                            ? "💼"
+                            : "📍"}
+
+                        </div>
+
+                      </div>
+
+                      <div className="address-user-details">
+
+                        {item.isDefault && (
+                          <span className="address-default-badge">
+                            Default
+                          </span>
+                        )}
+
+                        <h3>
+                          {item.type}
+                        </h3>
+
+                        <h4>
+                          {item.name}
+                        </h4>
+
+                        <p>
+                          {item.flat},{" "}
+                          {item.street},
+                        </p>
+
+                        <p>
+                          {item.city},{" "}
+                          {item.state}
+                          {" - "}
+                          {item.pincode}
+                        </p>
+
+                        <p>
+                          +91{" "}
+                          {item.mobile}
+                        </p>
+
+                      </div>
+
+                    </div>
+
+                    {/* CENTER */}
+
+                    <div className="address-card-center">
+
+                      <div className="address-info-row">
+
+                        <span>
+                          Address Type
+                        </span>
+
+                        <strong>
+                          {item.type}
+                        </strong>
+
+                      </div>
+
+                      <div className="address-info-row">
+
+                        <span>
+                          Pincode
+                        </span>
+
+                        <strong>
+                          {item.pincode}
+                        </strong>
+
+                      </div>
+
+                      <div className="address-info-row">
+
+                        <span>
+                          Phone Number
+                        </span>
+
+                        <strong>
+                          +91{" "}
+                          {item.mobile}
+                        </strong>
+
+                      </div>
+
+                    </div>
+
+                    {/* RIGHT */}
+
+                    <div className="address-card-actions">
+
+                      <button
+                        className="address-edit-btn"
+                        onClick={(e) => {
+
+                          e.stopPropagation();
+
+                          openEditForm(item);
+
+                        }}
+                      >
+                        ✏ Edit
+                      </button>
+
+                      <button
+                        className="address-delete-btn"
+                        onClick={(e) =>
+                          handleDelete(
+                            item.id,
+                            e
+                          )
+                        }
+                      >
+                        🗑 Remove
+                      </button>
+
+                    </div>
+
+                  </div>
+
+                ))}
+
+                {/* SAFE BOX */}
+
+                <div className="address-safe-box">
+
+                  <div className="address-safe-icon">
+                    🛡
+                  </div>
+
+                  <div>
+
+                    <h4>
+                      Secure & Hassle-free
+                      Delivery
+                    </h4>
+
+                    <p>
+                      Your addresses are safe
+                      with us. We ensure
+                      on-time and secure
+                      delivery to your
+                      doorstep.
+                    </p>
+
+                  </div>
+
+                </div>
+
+                {/* CONTINUE */}
+
+                <button
+                  className="address-continue-btn"
+                  disabled={
+                    !selectedAddress ||
+                    cartItems.length === 0
+                  }
+                  onClick={() =>
+                    navigate("/checkout")
+                  }
+                >
+                  Select & Continue
+                </button>
+              </>
+
+            ) : (
+
+              <AddNewAddress
+                userId={userId}
+              />
+
+            )}
+
+          </div>
+
+        </div>
+
+      </div>
 
       <Footer />
     </>
@@ -494,5 +900,3 @@ const Address = () => {
 };
 
 export default Address;
-
-

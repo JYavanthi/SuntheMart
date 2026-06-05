@@ -17,7 +17,7 @@ html, body {
 /* NAVBAR WRAPPER */
 .navbar-wrapper {
   width: 100%;
-  background: #ece4d7;
+  background: white;
   box-shadow: 0 2px 4px rgba(0,0,0,0.08);
   position: sticky;
   top: 0;
@@ -43,14 +43,19 @@ html, body {
 }
 
 .logo-circl img{
-   height: 70px;
-    width: 135px;
+  height: 77px;
+    width: 79px;
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: 35px;
+    margin-left: 14px;
 }
 
+.logo-text img{
+     width: 131px;
+    height: 47px;
+    margin-top: 11px;
+}
 .logo-text h2 {
   margin: 0;
   font-size: 22px;
@@ -71,15 +76,13 @@ html, body {
 
 /* NAV LINKS */
 .nav-links {
-    list-style: none;
+       list-style: none;
     display: flex;
-    gap: 36px;
-    font-size: 14px;
+    gap: 30px;
+    font-size: 13px;
     font-weight: 500;
-    padding-right: 30px;
-    padding-left: 31px;
-    letter-spacing: 1px;
-    margin-top: 14px;
+    color: #446044;
+    
 }
 
 .nav-links li {
@@ -128,7 +131,6 @@ html, body {
 
 .nav-search {
   display: flex;
-  margin-right: 23px;
   position: relative;
   
 }

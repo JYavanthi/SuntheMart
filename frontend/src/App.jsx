@@ -43,7 +43,33 @@ import AdminDiscounts from "./admin_back_office/AdminDiscounts";
 import AdminViewDiscounts from "./admin_back_office/AdminViewDiscounts";
 import AdminRoute from "./routes/AdminRoute";
 import UserRoute from "./routes/UserRoute";
+import CategorySection from "./HeroCategory";
+import HomeProducts from "./HomeProducts";
+import HowItWorks from "./HowItWorks";
+import Reviews from "./Reviews";
+import AppDownload from "./AppDownload";
+import SantheMarketTour from "./SantheMarketTour"; 
+import Blog from "./OurBlog";
+import SantheMarket3D from "./SantheMarketTour";
+import Category from "./Categories";
+import ContactUs from "./Contact";
+import AboutUsPage from "./AboutUsPage";
+import Works from "./HowItWorksPage";
+import FAQ from "./FAQs";
+import Checkout from "./Checkout";
+import MyOrders from "./MyOrders";
+import ProfWishlist from "./Profile_wishlist";
+import AccountInfo from "./Acnt-info";
+import AddVendor from "./admin_back_office/AddVendor";
+import AllVendors from "./admin_back_office/AllVendors";
+import VendorApplications from "./admin_back_office/VendorApplications";
 
+import VendorApplicationDetails from "./admin_back_office/pages/VendorApplicationDetails";
+import Dashboard from "./admin_back_office/dashboard";
+import ActiveVendors from "./admin_back_office/ActiveVendors";
+import VendorDetails from "./admin_back_office/pages/VendorDetails";
+import ProductDetailsSection from "./admin_back_office/components/ProductDetailsSection";
+import PricingSection from "./admin_back_office/components/PricingSection";
 function HomePage() {
   const location = useLocation();
 
@@ -59,11 +85,14 @@ function HomePage() {
       <Navbar />
       <section id="home"> <Hero /> </section>
  
-      <section id="products">  <Products /><ProductGrid />  </section>
+      <section id="products">  <CategorySection /><HomeProducts /><HowItWorks/> </section>
 
       <section id="about">  <AboutPage /> </section>
 
-      <section id="mission"> <Mission /> </section>
+      <section id="review"> <Reviews /> </section>
+      <section id="appdownload"> <AppDownload /> </section>
+
+      <section id="blog"> <Blog /> </section>
 
       <section id="contact"> <Footer />  </section>
     </>
@@ -88,16 +117,25 @@ function App() {
   }}
 />
             <Routes>
-          
+            <Route path="/virtual-tour" element={<SantheMarket3D />} />
               <Route path="/" element={ <HomePage />} />
               <Route path="/cart" element={<Cart />} />
               <Route path="/productList" element={<ProductList />} />
               <Route path="/categoryProductPage" element={<CategoryProductPage />} />
+              <Route path="/categories" element={<Category />} />
+              <Route path="/contact" element={<ContactUs />} />
+               <Route path="/howitworkspage" element={<Works/>} />
+              <Route path="/aboutuspage" element={<AboutUsPage />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
               <Route path="/profile" element={<Profile />} />
+               <Route path="/MyOrders" element={<MyOrders />} />
               <Route path="/wishlist" element={<Wishlist />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/profwishlist" element={<ProfWishlist />} />
+              <Route path="/acntinfo" element={<AccountInfo/>} />
+
               <Route path="/address" element={<Address />} />
               <Route path="/cart-address" element={<CartAddress />} />
               <Route path="/address-form-modal" element={<AddressFormModal />} />
@@ -105,10 +143,12 @@ function App() {
               <Route path="/t&c" element={<TermsConditions />} />
               <Route path="/payment" element={<Payment />} />
               <Route path="/success" element={<Success />} />
+              <Route path="/faqs" element={<FAQ />} />
               
               <Route path="/admin/*" element={<AdminLayout />} />  
               <Route path="/chart" element={<Charts/>} />
               <Route path="/addProduct" element={<AddProduct/>} />
+              <Route path="/dashboard" element={<Dashboard/>} />
               <Route path="/AdminProduct" element={<AdminProduct/>} />
               <Route path="/AdminChooseCategory" element={<AdminChooseCategory/>} />
               <Route path="/AdminCategory" element={<AdminCategory/>} />
@@ -119,6 +159,17 @@ function App() {
               <Route path="/AdminPaymentDetails/:id" element={<AdminPaymentDetails/>} />
               <Route path="/AdminDiscounts" element={<AdminDiscounts/>} />
               <Route path="/AdminViewDiscounts" element={<AdminViewDiscounts/>} />
+              <Route path="/addvendor" element={<AddVendor/>} />
+              <Route path="/allvendors" element={<AllVendors/>} />
+              <Route path="/vendorapplications" element={<VendorApplications/>}/>
+              <Route path="/vendorapplicationdetails/:id" element={<VendorApplicationDetails/>}/>
+               <Route path="/activevendors" element={<ActiveVendors/>}/>
+               <Route path="/vendor-details" element={<VendorDetails />}/>
+              
+
+               <Route path="/add-product-details" element={<ProductDetailsSection />}/>
+                <Route path="/pricingsection" element={<PricingSection />}/>
+
             </Routes>
             {/* <Routes>
   <Route path="/login" element={<Login />} />

@@ -1,0 +1,125 @@
+.active-vendor-details-page{
+  padding:20px;
+}
+
+.vendor-header-card{
+  background:#fff;
+  border-radius:15px;
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  margin-bottom:20px;
+}
+
+.vendor-header-left{
+  display:flex;
+  gap:20px;
+}
+
+.vendor-logo{
+  width:80px;
+  height:80px;
+  border-radius:50%;
+  background:#e8f5e9;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:35px;
+}
+
+.vendor-status{
+  background:#dff5df;
+  color:green;
+  padding:4px 10px;
+  border-radius:20px;
+  font-size:12px;
+}
+
+.vendor-header-right{
+  display:flex;
+  gap:50px;
+}
+
+.vendor-tabs{
+  display:flex;
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.vendor-tabs button{
+  border:none;
+  background:#eee;
+  padding:10px 20px;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.vendor-tabs .active{
+  background:#16a34a;
+  color:#fff;
+}
+
+.vendor-stat-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:20px;
+}
+
+.vendor-stat-card{
+  background:#fff;
+  padding:20px;
+  border-radius:15px;
+}
+
+.vendor-chart-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:15px;
+}
+
+.vendor-box{
+  background:#fff;
+  border-radius:15px;
+  padding:20px;
+  margin-top:15px;
+}
+
+.dummy-chart{
+  height:250px;
+  background:#f5f5f5;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.vendor-performance-top{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+}
+
+.vendor-performance-top input{
+  flex:1;
+  padding:12px;
+}
+
+.add-product-btn{
+  background:#16a34a;
+  color:#fff;
+  border:none;
+  padding:12px 20px;
+  border-radius:10px;
+}
+
+.vendor-table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.vendor-table th,
+.vendor-table td{
+  padding:12px;
+  border-bottom:1px solid #eee;
+}

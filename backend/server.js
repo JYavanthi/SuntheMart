@@ -30,7 +30,7 @@ const PORT = process.env.PORT || 4000;
 // };
 
 const connectionString =
-  "Driver={ODBC Driver 17 for SQL Server};Server=DESKTOP-SVHEEK2\\SQLEXPRESS;Database=Brihati;Trusted_Connection=Yes;TrustServerCertificate=Yes;";
+  "Driver={ODBC Driver 17 for SQL Server};Server=DESKTOP-SVHEEK2\\SQLEXPRESS;Database=SantheMart;Trusted_Connection=Yes;TrustServerCertificate=Yes;";
 
 sql.connect({ connectionString })
   .then(() => console.log("✅ Connected to SQL Server successfully!"))
@@ -50,6 +50,7 @@ sql.connect({ connectionString })
     trustServerCertificate: true
   }
 };
+
 // Create folder if not exists
 const categoryUploadPath = path.join(__dirname, "uploads/categories");
 
@@ -93,6 +94,65 @@ const productUpload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }
 });
 
+// Vendor uploads folder
+
+const vendorUploadPath = path.join(
+__dirname,
+"uploads/vendors"
+);
+
+if (!fs.existsSync(vendorUploadPath)) {
+
+fs.mkdirSync(
+vendorUploadPath,
+{ recursive:true }
+);
+
+}
+
+const vendorStorage =
+multer.diskStorage({
+
+destination:(req,file,cb)=>{
+
+cb(
+null,
+vendorUploadPath
+);
+
+},
+
+filename:(req,file,cb)=>{
+
+const uniqueName=
+
+Date.now()+
+"-"+
+file.originalname;
+
+cb(
+null,
+uniqueName
+);
+
+}
+
+});
+
+const vendorUpload=
+multer({
+
+storage:vendorStorage,
+
+limits:{
+
+fileSize:
+10*1024*1024
+
+}
+
+});
+
 
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
@@ -109,6 +169,9 @@ app.listen(PORT,(error)=>{
     console.log("error:"+error)
   }
 })
+
+
+
 
 //roles
 app.get("/api/roles", async (req, res) => {
@@ -349,7 +412,7 @@ app.post("/api/users", async (req, res) => {
     }
 
     // ✅ ALWAYS CUSTOMER ROLE
-    const CUSTOMER_ROLE_ID = 5;
+    const CUSTOMER_ROLE_ID = 2;
 
     const result = await pool.request()
       .input("RoleID", sql.Int, CUSTOMER_ROLE_ID)   // 🔥 forced
@@ -391,80 +454,6 @@ app.post("/api/users", async (req, res) => {
   }
 });
 
-// app.put("/api/users/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     const {
-//       FirstName,
-//       LastName,
-//       Email,
-//       ContactNo,
-//       DOB,
-//       Gender,
-//       PasswordHash
-//     } = req.body;
-
-//     const pool = await sql.connect(dbConfig);
-
-//     // 🔍 CHECK if another user already has same email/phone
-//     const existingUser = await pool.request()
-//       .input("Email", sql.NVarChar, Email)
-//       .input("ContactNo", sql.NVarChar, ContactNo)
-//       .input("UserID", sql.Int, id)
-//       .query(`
-//         SELECT TOP 1 *
-//         FROM UserMaster
-//         WHERE (Email = @Email OR ContactNo = @ContactNo)
-//         AND UserID != @UserID
-//       `);
-
-//     if (existingUser.recordset.length > 0) {
-//       return res.status(409).json({
-//         success: false,
-//         message: "Email or phone already used by another account"
-//       });
-//     }
-
-//     // ✅ UPDATE USER
-//     await pool.request()
-//       .input("UserID", sql.Int, id)
-//       .input("FirstName", sql.NVarChar, FirstName)
-//       .input("LastName", sql.NVarChar, LastName)
-//       .input("Email", sql.NVarChar, Email)
-//       .input("ContactNo", sql.NVarChar, ContactNo)
-//       .input("DOB", sql.Date, DOB)
-//       .input("Gender", sql.NVarChar, Gender)
-//       .input("PasswordHash", sql.NVarChar, PasswordHash || null)
-//       .query(`
-//         UPDATE UserMaster
-//         SET FirstName = @FirstName,
-//             LastName = @LastName,
-//             Email = @Email,
-//             ContactNo = @ContactNo,
-//             DOB = @DOB,
-//             Gender = @Gender,
-//             PasswordHash = ISNULL(@PasswordHash, PasswordHash),
-//             UpdatedDt = GETDATE()
-//         WHERE UserID = @UserID
-//       `);
-
-//     res.json({
-//       success: true,
-//       message: "Profile updated successfully"
-//     });
-
-//   } catch (error) {
-//     console.error("❌ Update error:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Update failed",
-//       error: error.message
-//     });
-//   }
-// });
-
-//untouched
 
 app.put("/api/users/:id", async (req, res) => {
   try {
@@ -822,6 +811,9 @@ app.put("/api/users/:id/recover", async (req, res) => {
 //     });
 //   }
 // });
+
+
+
 app.get("/api/products", async (req, res) => {
   try {
     const pool = await sql.connect(dbConfig);
@@ -886,103 +878,8 @@ app.get("/api/products", async (req, res) => {
   }
 });
 
-//to display ind products by id
-// app.get("/api/products/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
 
-//     const request = new sql.Request();
-//     request.input("id", sql.Int, id);
 
-//     const result = await request.query(`
-//       SELECT 
-//         p.ProductID,
-//         p.ProductName,
-//         p.ProductDescription,
-//         p.Quantity AS ProductWeight,
-//         ISNULL(pr.Price, 0) AS Price,
-//         ISNULL(pr.DiscountPrice, 0) AS DiscountPrice
-//       FROM ProductMaster p
-//       LEFT JOIN ProductPriceMaster pr 
-//         ON p.ProductID = pr.ProductID
-//       WHERE p.ProductID = @id
-//     `);
-
-//     if (!result.recordset || result.recordset.length === 0) {
-//       return res.status(404).json({ message: "Product not found" });
-//     }
-
-//     res.json(result.recordset[0]);
-
-//   } catch (err) {
-//     console.error("🔥 SINGLE PRODUCT API ERROR:", err);
-//     res.status(500).json({
-//       error: "Single product fetch failed",
-//       details: err.message
-//     });
-//   }
-// });
-// app.get("/api/products/:id", async (req, res) => {
-//   try {
-//     const { id } = req.params;
-
-//     const pool = await sql.connect(dbConfig);
-
-//     const productResult = await pool.request()
-//       .input("id", sql.Int, id)
-//       .query(`
-//         SELECT 
-//           p.ProductID,
-//           p.ProductName,
-//           p.ProductDescription,
-//           p.Quantity AS ProductWeight,
-//           ISNULL(pr.Price, 0) AS Price,
-//           ISNULL(pr.DiscountPrice, 0) AS DiscountPrice
-//         FROM ProductMaster p
-//         LEFT JOIN ProductPriceMaster pr 
-//           ON p.ProductID = pr.ProductID
-//         WHERE p.ProductID = @id
-//       `);
-
-//     if (productResult.recordset.length === 0) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Product not found"
-//       });
-//     }
-
-//     const imagesResult = await pool.request()
-//       .input("id", sql.Int, id)
-//       .query(`
-//         SELECT AttachmentFile
-//         FROM Attachments
-//         WHERE ProductID = @id
-//         ORDER BY SortOrder ASC
-//       `);
-
-//     const product = productResult.recordset[0];
-
-//     const images = imagesResult.recordset.map(img =>
-//       `http://localhost:4000${img.AttachmentFile}`
-//     );
-
-//     res.status(200).json({
-//       success: true,
-//       data: {
-//         ...product,
-//         Images: images
-//       }
-//     });
-
-//   } catch (err) {
-//     console.error("❌ GET SINGLE PRODUCT ERROR:", err);
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to fetch product",
-//       error: err.message
-//     });
-//   }
-// });
 app.get("/api/products/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -1049,21 +946,23 @@ app.get("/api/products/:id", async (req, res) => {
 });
 
 //to add products to product master table
+
+
 // app.post("/api/products", async (req, res) => {
-//   try { 
+//   try {
 //     const {
 //       ProductCategoryID,
 //       ProductName,
-//       ProductCode,
 //       ProductDescription,
 //       Quantity,
 //       SKU,
 //       Status,
 //       IsFeatured,
-//       CreatedBy
+//       CreatedBy,
+//       ProductWeight,
+//        HomeSection      
 //     } = req.body;
 
-//     // Basic validation
 //     if (!ProductCategoryID || !ProductName) {
 //       return res.status(400).json({
 //         success: false,
@@ -1071,49 +970,57 @@ app.get("/api/products/:id", async (req, res) => {
 //       });
 //     }
 
-//     const request = new sql.Request();
+//     const pool = await sql.connect(dbConfig);
 
-//     request.input("ProductCategoryID", sql.Int, ProductCategoryID);
-//     request.input("ProductName", sql.NVarChar, ProductName);
-//     request.input("ProductCode", sql.NVarChar, ProductCode ?? null);
-//     request.input("ProductDescription", sql.NVarChar, ProductDescription ?? null);
-//     request.input("Quantity", sql.Int, Quantity ?? 0);
-//     request.input("SKU", sql.NVarChar, SKU ?? null);
-//     request.input("Status", sql.Bit, Status ?? 1);
-//     request.input("IsFeatured", sql.Bit, IsFeatured ?? 0);
-//     request.input("CreatedBy", sql.Int, CreatedBy ?? 1);
+//     // ✅ AUTO GENERATE PRODUCT CODE
+//     const ProductCode = "PRD-" + Date.now();
 
-//     const query = `
-//       INSERT INTO dbo.ProductMaster
-//       (
-//         ProductCategoryID,
-//         ProductName,
-//         ProductCode,
-//         ProductDescription,
-//         Quantity,
-//         SKU,
-//         Status,
-//         IsFeatured,
-//         CreatedBy,
-//         CreatedDt
-//       )
-//       OUTPUT INSERTED.ProductID
-//       VALUES
-//       (
-//         @ProductCategoryID,
-//         @ProductName,
-//         @ProductCode,
-//         @ProductDescription,
-//         @Quantity,
-//         @SKU,
-//         @Status,
-//         @IsFeatured,
-//         @CreatedBy,
-//         GETDATE()
-//       )
-//     `;
-
-//     const result = await request.query(query);
+//     const result = await pool.request()
+    
+//       .input("ProductCategoryID", sql.Int, ProductCategoryID)
+//       .input("ProductName", sql.NVarChar(200), ProductName)
+//       .input("ProductCode", sql.NVarChar(100), ProductCode)
+//       .input("ProductDescription", sql.NVarChar(sql.MAX), ProductDescription ?? "")
+//       .input("Quantity", sql.Int, Quantity ?? 0)
+//       .input("SKU", sql.NVarChar(100), SKU ?? "")
+//       .input("Status", sql.Bit, Status ?? 1)
+//       .input("IsFeatured", sql.Bit, IsFeatured ?? 0)
+//       .input("CreatedBy", sql.Int, CreatedBy ?? 1)
+//       .input("ProductWeight", sql.NVarChar(50), ProductWeight ?? "")  // ✅ ADD THIS
+//       .input("HomeSection", sql.VarChar(50), HomeSection ?? null)
+//       .query(`
+//         INSERT INTO ProductMaster
+//         (
+//           ProductCategoryID,
+//           ProductName,
+//           ProductCode,
+//           ProductDescription,
+//           Quantity,
+//           SKU,
+//           Status,
+//           IsFeatured,
+//           CreatedBy,
+//           CreatedDt,
+//           ProductWeight,
+//           HomeSection       -- ✅ ADD THIS
+//         )
+//         OUTPUT INSERTED.ProductID
+//         VALUES
+//         (
+//           @ProductCategoryID,
+//           @ProductName,
+//           @ProductCode,
+//           @ProductDescription,
+//           @Quantity,
+//           @SKU,
+//           @Status,
+//           @IsFeatured,
+//           @CreatedBy,
+//           GETDATE(),
+//           @ProductWeight,  
+//           @HomeSection    -- ✅ ADD THIS
+//         )
+//       `);
 
 //     res.status(201).json({
 //       success: true,
@@ -1122,7 +1029,7 @@ app.get("/api/products/:id", async (req, res) => {
 //     });
 
 //   } catch (error) {
-//     console.error("❌ Error creating product:", error);
+//     console.error("❌ CREATE PRODUCT ERROR:", error);
 //     res.status(500).json({
 //       success: false,
 //       message: "Failed to create product",
@@ -1130,10 +1037,13 @@ app.get("/api/products/:id", async (req, res) => {
 //     });
 //   }
 // });
-
 app.post("/api/products", async (req, res) => {
+
   try {
+
     const {
+
+      VendorID,
       ProductCategoryID,
       ProductName,
       ProductDescription,
@@ -1142,105 +1052,220 @@ app.post("/api/products", async (req, res) => {
       Status,
       IsFeatured,
       CreatedBy,
-      ProductWeight     // ✅ ADD THIS
-    } = req.body;
+      ProductWeight,
+      HomeSection
 
-    if (!ProductCategoryID || !ProductName) {
-      return res.status(400).json({
-        success: false,
-        message: "ProductCategoryID and ProductName are required"
-      });
-    }
+    } = req.body;
 
     const pool = await sql.connect(dbConfig);
 
-    // ✅ AUTO GENERATE PRODUCT CODE
     const ProductCode = "PRD-" + Date.now();
 
     const result = await pool.request()
+
+      .input("VendorID", sql.Int, VendorID)
+
       .input("ProductCategoryID", sql.Int, ProductCategoryID)
+
       .input("ProductName", sql.NVarChar(200), ProductName)
+
       .input("ProductCode", sql.NVarChar(100), ProductCode)
+
       .input("ProductDescription", sql.NVarChar(sql.MAX), ProductDescription ?? "")
+
       .input("Quantity", sql.Int, Quantity ?? 0)
+
       .input("SKU", sql.NVarChar(100), SKU ?? "")
+
       .input("Status", sql.Bit, Status ?? 1)
+
       .input("IsFeatured", sql.Bit, IsFeatured ?? 0)
+
       .input("CreatedBy", sql.Int, CreatedBy ?? 1)
-      .input("ProductWeight", sql.NVarChar(50), ProductWeight ?? "")  // ✅ ADD THIS
+
+      .input("ProductWeight", sql.NVarChar(50), ProductWeight ?? "")
+
+      .input("HomeSection", sql.VarChar(50), HomeSection ?? null)
+
       .query(`
-        INSERT INTO ProductMaster
-        (
-          ProductCategoryID,
-          ProductName,
-          ProductCode,
-          ProductDescription,
-          Quantity,
-          SKU,
-          Status,
-          IsFeatured,
-          CreatedBy,
-          CreatedDt,
-          ProductWeight       -- ✅ ADD THIS
-        )
-        OUTPUT INSERTED.ProductID
-        VALUES
-        (
-          @ProductCategoryID,
-          @ProductName,
-          @ProductCode,
-          @ProductDescription,
-          @Quantity,
-          @SKU,
-          @Status,
-          @IsFeatured,
-          @CreatedBy,
-          GETDATE(),
-          @ProductWeight      -- ✅ ADD THIS
-        )
+
+      INSERT INTO ProductMaster
+      (
+        VendorID,
+        ProductCategoryID,
+        ProductName,
+        ProductCode,
+        ProductDescription,
+        Quantity,
+        SKU,
+        Status,
+        IsFeatured,
+        CreatedBy,
+        CreatedDt,
+        ProductWeight,
+        HomeSection
+      )
+
+      OUTPUT INSERTED.ProductID
+
+      VALUES
+      (
+        @VendorID,
+        @ProductCategoryID,
+        @ProductName,
+        @ProductCode,
+        @ProductDescription,
+        @Quantity,
+        @SKU,
+        @Status,
+        @IsFeatured,
+        @CreatedBy,
+        GETDATE(),
+        @ProductWeight,
+        @HomeSection
+      )
+
+      `);
+
+    const ProductID =
+      result.recordset[0].ProductID;
+
+    await pool.request()
+
+      .input("VendorID", sql.Int, VendorID)
+
+      .input("ProductID", sql.Int, ProductID)
+
+      .query(`
+
+      INSERT INTO VendorProduct
+      (
+        VendorID,
+        ProductID,
+        IsActive,
+        CreatedDt
+      )
+
+      VALUES
+      (
+        @VendorID,
+        @ProductID,
+        1,
+        GETDATE()
+      )
+
       `);
 
     res.status(201).json({
+
       success: true,
-      message: "Product created successfully",
-      ProductID: result.recordset[0].ProductID
+
+      ProductID
+
     });
 
-  } catch (error) {
-    console.error("❌ CREATE PRODUCT ERROR:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create product",
-      error: error.message
-    });
   }
+
+  catch (error) {
+
+    console.log(error);
+
+    res.status(500).json({
+
+      success: false
+
+    });
+
+  }
+
 });
 
+// app.put("/api/products/:id", async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const {
+//       ProductCategoryID,
+//       ProductName,
+//       ProductDescription,
+//       Quantity,
+//       SKU,
+//       Status,
+//       ProductWeight,
+//       HomeSection
+//     } = req.body;
+
+//     if (!ProductCategoryID || !ProductName) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "ProductCategoryID and ProductName are required"
+//       });
+//     }
+
+//     const pool = await sql.connect(dbConfig);
+
+//     await pool.request()
+//       .input("ProductID", sql.Int, id)
+//       .input("ProductCategoryID", sql.Int, ProductCategoryID)
+//       .input("ProductName", sql.NVarChar(200), ProductName)
+//       .input("ProductDescription", sql.NVarChar(sql.MAX), ProductDescription ?? "")
+//       .input("Quantity", sql.Int, Quantity ?? 0)
+//       .input("SKU", sql.NVarChar(100), SKU ?? "")
+//       .input("Status", sql.Bit, Status ?? 1)
+//       .input("ProductWeight", sql.NVarChar(50), ProductWeight ?? "")
+//       .input("HomeSection", sql.VarChar(50), HomeSection ?? null)
+//       .query(`
+//         UPDATE ProductMaster
+//         SET
+//           ProductCategoryID = @ProductCategoryID,
+//           ProductName = @ProductName,
+//           ProductDescription = @ProductDescription,
+//           Quantity = @Quantity,
+//           SKU = @SKU,
+//           Status = @Status,
+//           ProductWeight = @ProductWeight,
+//           HomeSection = @HomeSection 
+//         WHERE ProductID = @ProductID
+//       `);
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Product updated successfully"
+//     });
+
+//   } catch (error) {
+//     console.error("❌ UPDATE PRODUCT ERROR:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to update product",
+//       error: error.message
+//     });
+//   }
+// });
 app.put("/api/products/:id", async (req, res) => {
   try {
+
     const { id } = req.params;
 
     const {
+      VendorID,
       ProductCategoryID,
       ProductName,
       ProductDescription,
       Quantity,
       SKU,
       Status,
-      ProductWeight
+      ProductWeight,
+      HomeSection
     } = req.body;
-
-    if (!ProductCategoryID || !ProductName) {
-      return res.status(400).json({
-        success: false,
-        message: "ProductCategoryID and ProductName are required"
-      });
-    }
 
     const pool = await sql.connect(dbConfig);
 
     await pool.request()
+
       .input("ProductID", sql.Int, id)
+      .input("VendorID", sql.Int, VendorID)
+
       .input("ProductCategoryID", sql.Int, ProductCategoryID)
       .input("ProductName", sql.NVarChar(200), ProductName)
       .input("ProductDescription", sql.NVarChar(sql.MAX), ProductDescription ?? "")
@@ -1248,62 +1273,86 @@ app.put("/api/products/:id", async (req, res) => {
       .input("SKU", sql.NVarChar(100), SKU ?? "")
       .input("Status", sql.Bit, Status ?? 1)
       .input("ProductWeight", sql.NVarChar(50), ProductWeight ?? "")
+      .input("HomeSection", sql.VarChar(50), HomeSection ?? null)
+
       .query(`
         UPDATE ProductMaster
         SET
+
+          VendorID = @VendorID,
+
           ProductCategoryID = @ProductCategoryID,
           ProductName = @ProductName,
           ProductDescription = @ProductDescription,
           Quantity = @Quantity,
           SKU = @SKU,
           Status = @Status,
-          ProductWeight = @ProductWeight
+          ProductWeight = @ProductWeight,
+          HomeSection = @HomeSection,
+          ModifiedDt = GETDATE()
+
         WHERE ProductID = @ProductID
       `);
 
-    res.status(200).json({
-      success: true,
-      message: "Product updated successfully"
-    });
-
-  } catch (error) {
-    console.error("❌ UPDATE PRODUCT ERROR:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to update product",
-      error: error.message
-    });
-  }
-});
-
-app.delete("/api/products/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const pool = await sql.connect(dbConfig);
+    /* Update VendorProduct mapping */
 
     await pool.request()
+
+      .input("VendorID", sql.Int, VendorID)
       .input("ProductID", sql.Int, id)
+
       .query(`
-        UPDATE ProductMaster
-        SET Status = 0
+
+        UPDATE VendorProduct
+        SET
+          VendorID = @VendorID
         WHERE ProductID = @ProductID
+
       `);
 
-    res.status(200).json({
-      success: true,
-      message: "Product deleted successfully"
+    res.json({
+      success: true
     });
 
   } catch (error) {
-    console.error("❌ DELETE PRODUCT ERROR:", error);
+
+    console.log(error);
+
     res.status(500).json({
-      success: false,
-      message: "Failed to delete product",
-      error: error.message
+      success: false
     });
+
   }
 });
+
+// app.delete("/api/products/:id", async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const pool = await sql.connect(dbConfig);
+
+//     await pool.request()
+//       .input("ProductID", sql.Int, id)
+//       .query(`
+//         UPDATE ProductMaster
+//         SET Status = 0
+//         WHERE ProductID = @ProductID
+//       `);
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Product deleted successfully"
+//     });
+
+//   } catch (error) {
+//     console.error("❌ DELETE PRODUCT ERROR:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to delete product",
+//       error: error.message
+//     });
+//   }
+// });
 
 
 //product categories
@@ -1339,6 +1388,59 @@ app.delete("/api/products/:id", async (req, res) => {
 //     });
 //   }
 // });
+app.delete("/api/products/:id", async (req, res) => {
+
+  try {
+
+    const { id } = req.params;
+
+    const pool = await sql.connect(dbConfig);
+
+    await pool.request()
+
+      .input("ProductID", sql.Int, id)
+
+      .query(`
+
+        UPDATE ProductMaster
+        SET
+          Status = 0,
+          ModifiedDt = GETDATE()
+
+        WHERE ProductID = @ProductID
+
+      `);
+
+    await pool.request()
+
+      .input("ProductID", sql.Int, id)
+
+      .query(`
+
+        UPDATE VendorProduct
+        SET
+          IsActive = 0
+
+        WHERE ProductID = @ProductID
+
+      `);
+
+    res.json({
+      success: true
+    });
+
+  } catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false
+    });
+
+  }
+
+});
+
 app.get("/api/product-categories", async (req, res) => {
   try {
     const result = await sql.query(`
@@ -1367,73 +1469,6 @@ app.get("/api/product-categories", async (req, res) => {
 });
 
 
-
-//adding product categories to product category table
-// app.post("/api/product-categories", async (req, res) => {
-//   try {
-//     const {
-//       CategoryName,
-//       CategoryDescription,
-//       Status,
-//       DisplayOrder,
-//       CreatedBy
-//     } = req.body;
-
-//     // Basic validation
-//     if (!CategoryName) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "CategoryName is required"
-//       });
-//     }
-
-//     const request = new sql.Request();
-
-//     request.input("CategoryName", sql.NVarChar, CategoryName);
-//     request.input("CategoryDescription", sql.NVarChar, CategoryDescription ?? null);
-//     request.input("Status", sql.Bit, Status ?? 1);
-//     request.input("DisplayOrder", sql.Int, DisplayOrder ?? 0);
-//     request.input("CreatedBy", sql.Int, CreatedBy ?? 1);
-
-//     const query = `
-//       INSERT INTO dbo.ProductCategory
-//       (
-//         CategoryName,   
-//         CategoryDescription,
-//         Status,
-//         DisplayOrder,
-//         CreatedBy,
-//         CreatedDt
-//       )
-//       OUTPUT INSERTED.ProductCategoryID
-//       VALUES
-//       (
-//         @CategoryName,
-//         @CategoryDescription,
-//         @Status,
-//         @DisplayOrder,
-//         @CreatedBy,
-//         GETDATE()
-//       )
-//     `;
-
-//     const result = await request.query(query);
-
-//     res.status(201).json({
-//       success: true,
-//       message: "Product category created successfully",
-//       ProductCategoryID: result.recordset[0].ProductCategoryID
-//     });
-
-//   } catch (error) {
-//     console.error("❌ Error creating product category:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: "Failed to create product category",
-//       error: error.message
-//     });
-//   }
-// });
 app.post("/api/product-categories", upload.single("CategoryImage"), async (req, res) => {
   try {
     const {
@@ -1633,134 +1668,284 @@ app.get("/api/product-prices", async (req, res) => {
 // });
 
 
+// app.post("/api/product-prices", async (req, res) => {
+//   try {
+//     const {
+//       ProductID,
+//       Price,
+//       DiscountPrice,
+//       ValidFrom,
+//       ValidTo,
+//       CreatedBy
+//     } = req.body;
+
+//     if (!ProductID || Price === undefined) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "ProductID and Price are required"
+//       });
+//     }
+
+//     if (DiscountPrice && DiscountPrice > Price) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "DiscountPrice cannot be greater than Price"
+//       });
+//     }
+
+//     const pool = await sql.connect(dbConfig);
+
+//     const result = await pool.request()
+//       .input("ProductID", sql.Int, ProductID)
+//       .input("Price", sql.Decimal(10, 2), Price)
+//       .input("DiscountPrice", sql.Decimal(10, 2), DiscountPrice ?? null)
+//       .input("ValidFrom", sql.DateTime, ValidFrom ?? new Date())
+//       .input("ValidTo", sql.DateTime, ValidTo ?? null)
+//       .input("CreatedBy", sql.Int, CreatedBy ?? 1)
+//       .query(`
+//         INSERT INTO ProductPriceMaster
+//         (
+//           ProductID,
+//           Price,
+//           DiscountPrice,
+//           ValidFrom,
+//           ValidTo,
+//           CreatedBy,
+//           CreatedDt
+//         )
+//         OUTPUT INSERTED.PriceID
+//         VALUES
+//         (
+//           @ProductID,
+//           @Price,
+//           @DiscountPrice,
+//           @ValidFrom,
+//           @ValidTo,
+//           @CreatedBy,
+//           GETDATE()
+//         )
+//       `);
+
+//     res.status(201).json({
+//       success: true,
+//       message: "Product price created successfully",
+//       PriceID: result.recordset[0].PriceID
+//     });
+
+//   } catch (error) {
+//     console.error("❌ CREATE PRICE ERROR:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to create product price",
+//       error: error.message
+//     });
+//   }
+// });
 app.post("/api/product-prices", async (req, res) => {
+
   try {
+
     const {
+
       ProductID,
       Price,
       DiscountPrice,
       ValidFrom,
       ValidTo,
       CreatedBy
+
     } = req.body;
-
-    if (!ProductID || Price === undefined) {
-      return res.status(400).json({
-        success: false,
-        message: "ProductID and Price are required"
-      });
-    }
-
-    if (DiscountPrice && DiscountPrice > Price) {
-      return res.status(400).json({
-        success: false,
-        message: "DiscountPrice cannot be greater than Price"
-      });
-    }
 
     const pool = await sql.connect(dbConfig);
 
     const result = await pool.request()
+
       .input("ProductID", sql.Int, ProductID)
-      .input("Price", sql.Decimal(10, 2), Price)
-      .input("DiscountPrice", sql.Decimal(10, 2), DiscountPrice ?? null)
+
+      .input("Price", sql.Decimal(18,2), Price)
+
+      .input("DiscountPrice", sql.Decimal(18,2), DiscountPrice ?? null)
+
       .input("ValidFrom", sql.DateTime, ValidFrom ?? new Date())
+
       .input("ValidTo", sql.DateTime, ValidTo ?? null)
+
       .input("CreatedBy", sql.Int, CreatedBy ?? 1)
+
       .query(`
-        INSERT INTO ProductPriceMaster
-        (
-          ProductID,
-          Price,
-          DiscountPrice,
-          ValidFrom,
-          ValidTo,
-          CreatedBy,
-          CreatedDt
-        )
-        OUTPUT INSERTED.PriceID
-        VALUES
-        (
-          @ProductID,
-          @Price,
-          @DiscountPrice,
-          @ValidFrom,
-          @ValidTo,
-          @CreatedBy,
-          GETDATE()
-        )
+
+      INSERT INTO ProductPriceMaster
+      (
+        ProductID,
+        Price,
+        DiscountPrice,
+        ValidFrom,
+        ValidTo,
+        CreatedBy,
+        CreatedDt
+      )
+
+      OUTPUT INSERTED.PriceID
+
+      VALUES
+      (
+        @ProductID,
+        @Price,
+        @DiscountPrice,
+        @ValidFrom,
+        @ValidTo,
+        @CreatedBy,
+        GETDATE()
+      )
+
       `);
 
-    res.status(201).json({
+    res.json({
+
       success: true,
-      message: "Product price created successfully",
-      PriceID: result.recordset[0].PriceID
+
+      PriceID:
+      result.recordset[0].PriceID
+
     });
 
-  } catch (error) {
-    console.error("❌ CREATE PRICE ERROR:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to create product price",
-      error: error.message
-    });
   }
+
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+
+      success:false
+
+    });
+
+  }
+
 });
 
+// app.put("/api/product-prices/:productId", async (req, res) => {
+//   try {
+//     const { productId } = req.params;
+
+//     const {
+//       Price,
+//       DiscountPrice
+//     } = req.body;
+
+//     if (Price === undefined) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "Price is required"
+//       });
+//     }
+
+//     if (DiscountPrice && DiscountPrice > Price) {
+//       return res.status(400).json({
+//         success: false,
+//         message: "DiscountPrice cannot be greater than Price"
+//       });
+//     }
+
+//     const pool = await sql.connect(dbConfig);
+
+//     await pool.request()
+//       .input("ProductID", sql.Int, productId)
+//       .input("Price", sql.Decimal(10,2), Price)
+//       .input("DiscountPrice", sql.Decimal(10,2), DiscountPrice ?? null)
+//       .query(`
+//         UPDATE ProductPriceMaster
+//         SET
+//           Price = @Price,
+//           DiscountPrice = @DiscountPrice
+//         WHERE ProductID = @ProductID
+//       `);
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Price updated successfully"
+//     });
+
+//   } catch (error) {
+//     console.error("❌ UPDATE PRICE ERROR:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: "Failed to update price",
+//       error: error.message
+//     });
+//   }
+// });
+
+
+//displaying the products based on their categories
 app.put("/api/product-prices/:productId", async (req, res) => {
+
   try {
+
     const { productId } = req.params;
 
     const {
+
       Price,
-      DiscountPrice
+      DiscountPrice,
+      ValidFrom,
+      ValidTo,
+      ModifiedBy
+
     } = req.body;
-
-    if (Price === undefined) {
-      return res.status(400).json({
-        success: false,
-        message: "Price is required"
-      });
-    }
-
-    if (DiscountPrice && DiscountPrice > Price) {
-      return res.status(400).json({
-        success: false,
-        message: "DiscountPrice cannot be greater than Price"
-      });
-    }
 
     const pool = await sql.connect(dbConfig);
 
     await pool.request()
+
       .input("ProductID", sql.Int, productId)
-      .input("Price", sql.Decimal(10,2), Price)
-      .input("DiscountPrice", sql.Decimal(10,2), DiscountPrice ?? null)
+
+      .input("Price", sql.Decimal(18,2), Price)
+
+      .input("DiscountPrice", sql.Decimal(18,2), DiscountPrice ?? null)
+
+      .input("ValidFrom", sql.DateTime, ValidFrom ?? null)
+
+      .input("ValidTo", sql.DateTime, ValidTo ?? null)
+
+      .input("ModifiedBy", sql.Int, ModifiedBy ?? 1)
+
       .query(`
+
         UPDATE ProductPriceMaster
+
         SET
+
           Price = @Price,
-          DiscountPrice = @DiscountPrice
+          DiscountPrice = @DiscountPrice,
+          ValidFrom = @ValidFrom,
+          ValidTo = @ValidTo,
+
+          ModifiedBy = @ModifiedBy,
+          ModifiedDt = GETDATE()
+
         WHERE ProductID = @ProductID
+
       `);
 
-    res.status(200).json({
-      success: true,
-      message: "Price updated successfully"
+    res.json({
+      success:true
     });
 
-  } catch (error) {
-    console.error("❌ UPDATE PRICE ERROR:", error);
-    res.status(500).json({
-      success: false,
-      message: "Failed to update price",
-      error: error.message
-    });
   }
+
+  catch(error){
+
+    console.log(error);
+
+    res.status(500).json({
+      success:false
+    });
+
+  }
+
 });
-
-
-//displaying the products based on their categories
 app.get("/api/categories", async (req, res) => {
   try {
     const result = await new sql.Request().query(`
@@ -2327,1226 +2512,7 @@ const MERCHANT_ID = "M222NJL8ZHVEM";
 const SALT_KEY = "3013c44a-99b1-4482-88b7-b1387e079b49";
 const SALT_INDEX = "1";
 
-//creating order details and delivery details and also the invoice(which in cludes deliveryId,shippingmode,) and  storing it in the db.
-// app.post("/api/order/create", async (req, res) => {
-//   try {
-//     const {
-//       userId,
-//       cartItems,
-//       totalAmount,
-//       taxAmount,
-//       paymentMode,
-//       shippingAddress   // optional (if you have address table)
-//     } = req.body;
 
-//     if (!cartItems || cartItems.length === 0) {
-//       return res.status(400).json({ message: "Cart empty" });
-//     }
-
-//     /* =========================
-//        1️⃣ CREATE ORDER MASTER
-//     ========================= */
-
-//     const orderResult = await new sql.Request()
-//       .input("UserID", sql.Int, userId)
-//       .input("TotalAmount", sql.Decimal(10, 2), totalAmount)
-//       .input("TaxAmount", sql.Decimal(10, 2), taxAmount)
-//       .input("PaymentMode", sql.VarChar(20), paymentMode || "DUMMY")
-//       .input("PaymentStatus", sql.VarChar(20), "PENDING")
-//       .input("OrderStatus", sql.VarChar(20), "CREATED")
-//       .input("CreatedBy", sql.Int, userId)
-//       .query(`
-//         INSERT INTO OrderMaster
-//         (
-//           UserID,
-//           OrderDate,
-//           TotalAmount,
-//           TaxAmount,
-//           PaymentMode,
-//           PaymentStatus,
-//           OrderStatus,
-//           CreatedBy,
-//           CreatedDt
-//         )
-//         OUTPUT INSERTED.OrderID
-//         VALUES
-//         (
-//           @UserID,
-//           GETDATE(),
-//           @TotalAmount,
-//           @TaxAmount,
-//           @PaymentMode,
-//           @PaymentStatus,
-//           @OrderStatus,
-//           @CreatedBy,
-//           GETDATE()
-//         )
-//       `);
-
-//     const orderId = orderResult.recordset[0].OrderID;
-
-//     /* =========================
-//        2️⃣ INSERT ORDER DETAILS
-//     ========================= */
-
-//     for (const item of cartItems) {
-//       const unitPrice = item.unitPrice;
-//       const quantity = item.quantity;
-//       const totalPrice = unitPrice * quantity;
-
-//       await new sql.Request()
-//         .input("OrderID", sql.Int, orderId)
-//         .input("ProductID", sql.Int, item.productId)
-//         .input("Quantity", sql.Int, quantity)
-//         .input("UnitPrice", sql.Decimal(10, 2), unitPrice)
-//         .input("TotalPrice", sql.Decimal(10, 2), totalPrice)
-//         .input("CreatedBy", sql.Int, userId)
-//         .query(`
-//           INSERT INTO OrderDetails
-//           (OrderID, ProductID, Quantity, UnitPrice, TotalPrice, CreatedBy, CreatedDt)
-//           VALUES
-//           (@OrderID, @ProductID, @Quantity, @UnitPrice, @TotalPrice, @CreatedBy, GETDATE())
-//         `);
-//     }
-
-//     /* =========================
-//        3️⃣ AUTO CREATE DELIVERY
-//     ========================= */
-
-//     const expectedDate = new Date();
-//     expectedDate.setDate(expectedDate.getDate() + 5); // +5 days delivery
-
-//     await new sql.Request()
-//       .input("OrderID", sql.Int, orderId)
-//       .input("UserID", sql.Int, userId)
-//       .input("ShippingMode", sql.VarChar(50), "STANDARD")
-//       .input("FromLocation", sql.VarChar(100), "Main Warehouse")
-//       .input("ToLocation", sql.VarChar(100), shippingAddress?.city || "Customer Address")
-//       .input("DeliveryStatus", sql.VarChar(50), "DELIVERY_PENDING")
-//       .input("ExpectedDeliveryDate", sql.DateTime, expectedDate)
-//       .input("CreatedBy", sql.Int, userId)
-//       .query(`
-//         INSERT INTO Delivery
-//         (
-//           OrderID,
-//           UserID,
-//           ShippingMode,
-//           FromLocation,
-//           ToLocation,
-//           DeliveryStatus,
-//           ExpectedDeliveryDate,
-//           CreatedBy,
-//           CreatedDt
-//         )
-//         VALUES
-//         (
-//           @OrderID,
-//           @UserID,
-//           @ShippingMode,
-//           @FromLocation,
-//           @ToLocation,
-//           @DeliveryStatus,
-//           @ExpectedDeliveryDate,
-//           @CreatedBy,
-//           GETDATE()
-//         )
-//       `);
-
-//     /* =========================
-//        4️⃣ RESPONSE
-//     ========================= */
-
-//     res.json({
-//       success: true,
-//       orderId,
-//       message: "Order + Delivery created successfully"
-//     });
-
-//   } catch (err) {
-//     console.error("❌ ORDER CREATE ERROR:", err);
-//     res.status(500).json({
-//       message: "Order creation failed",
-//       error: err.message
-//     });
-//   }
-// });
-
-// app.post("/api/order/create", async (req, res) => {
-//   try {
-//     const {
-//       userId,
-//       cartItems,
-//       totalAmount,
-//       taxAmount,
-//       paymentMode
-//     } = req.body;
-
-//     if (!cartItems || cartItems.length === 0) {
-//       return res.status(400).json({ message: "Cart empty" });
-//     }
-
-//     // 1️⃣ CREATE ORDER MASTER
-//     const orderResult = await new sql.Request()
-//       .input("UserID", sql.Int, userId)
-//       .input("TotalAmount", sql.Decimal(10, 2), totalAmount)
-//       .input("TaxAmount", sql.Decimal(10, 2), taxAmount)
-//       .input("PaymentMode", sql.VarChar(20), paymentMode || "DUMMY")
-//       .input("PaymentStatus", sql.VarChar(20), "PENDING")
-//       .input("OrderStatus", sql.VarChar(20), "CREATED")
-//       .input("CreatedBy", sql.Int, userId)
-//       .query(`
-//         INSERT INTO OrderMaster
-//         (
-//           UserID,
-//           OrderDate,
-//           TotalAmount,
-//           TaxAmount,
-//           PaymentMode,
-//           PaymentStatus,
-//           OrderStatus,
-//           CreatedBy,
-//           CreatedDt
-//         )
-//         OUTPUT INSERTED.OrderID
-//         VALUES
-//         (
-//           @UserID,
-//           GETDATE(),
-//           @TotalAmount,
-//           @TaxAmount,
-//           @PaymentMode,
-//           @PaymentStatus,
-//           @OrderStatus,
-//           @CreatedBy,
-//           GETDATE()
-//         )
-//       `);
-
-//     const orderId = orderResult.recordset[0].OrderID;
-
-//     // 2️⃣ INSERT ORDER DETAILS
-//     for (const item of cartItems) {
-//       const unitPrice = item.unitPrice;
-//       const quantity = item.quantity;
-//       const totalPrice = unitPrice * quantity;
-
-//       await new sql.Request()
-//         .input("OrderID", sql.Int, orderId)
-//         .input("ProductID", sql.Int, item.productId)
-//         .input("Quantity", sql.Int, quantity)
-//         .input("UnitPrice", sql.Decimal(10, 2), unitPrice)
-//         .input("TotalPrice", sql.Decimal(10, 2), totalPrice)
-//         .input("CreatedBy", sql.Int, userId)
-//         .query(`
-//           INSERT INTO OrderDetails
-//           (OrderID, ProductID, Quantity, UnitPrice, TotalPrice, CreatedBy, CreatedDt)
-//           VALUES
-//           (@OrderID, @ProductID, @Quantity, @UnitPrice, @TotalPrice, @CreatedBy, GETDATE())
-//         `);
-//     }
-
-//     res.json({
-//       success: true,
-//       orderId
-//     });
-
-//   } catch (err) {
-//     console.error("❌ ORDER CREATE ERROR:", err);
-//     res.status(500).json({
-//       message: "Order creation failed",
-//       error: err.message
-//     });
-//   }
-// });
-
-//getting the order details from database to post it in payment success page
-// app.post("/api/order/create", async (req, res) => {
-//   try {
-//     const {
-//       userId,
-//       cartItems,
-//       totalAmount,
-//       taxAmount,
-//       paymentMode,
-//       shippingAddress : selectedAddress
-//     } = req.body;
-
-//     if (!cartItems || cartItems.length === 0) {
-//       return res.status(400).json({ message: "Cart empty" });
-//     }
-
-//     /* =========================
-//        1️⃣ CREATE ORDER MASTER
-//     ========================= */
-
-//     const orderResult = await new sql.Request()
-//       .input("UserID", sql.Int, userId)
-//       .input("TotalAmount", sql.Decimal(10, 2), totalAmount)
-//       .input("TaxAmount", sql.Decimal(10, 2), taxAmount)
-//       .input("PaymentMode", sql.VarChar(20), paymentMode || "DUMMY")
-//       .input("PaymentStatus", sql.VarChar(20), "SUCCESS")
-//       .input("OrderStatus", sql.VarChar(20), "CONFIRMED")
-//       .input("CreatedBy", sql.Int, userId)
-//       .query(`
-//         INSERT INTO OrderMaster
-//         (
-//           UserID,
-//           OrderDate,
-//           TotalAmount,
-//           TaxAmount,
-//           PaymentMode,
-//           PaymentStatus,
-//           OrderStatus,
-//           CreatedBy,
-//           CreatedDt
-//         )
-//         OUTPUT INSERTED.OrderID
-//         VALUES
-//         (
-//           @UserID,
-//           GETDATE(),
-//           @TotalAmount,
-//           @TaxAmount,
-//           @PaymentMode,
-//           @PaymentStatus,
-//           @OrderStatus,
-//           @CreatedBy,
-//           GETDATE()
-//         )
-//       `);
-
-//     const orderId = orderResult.recordset[0].OrderID;
-
-//     /* =========================
-//        2️⃣ INSERT ORDER DETAILS
-//     ========================= */
-
-//     for (const item of cartItems) {
-//       const unitPrice = item.unitPrice;
-//       const quantity = item.quantity;
-//       const totalPrice = unitPrice * quantity;
-
-//       await new sql.Request()
-//         .input("OrderID", sql.Int, orderId)
-//         .input("ProductID", sql.Int, item.productId)
-//         .input("Quantity", sql.Int, quantity)
-//         .input("UnitPrice", sql.Decimal(10, 2), unitPrice)
-//         .input("TotalPrice", sql.Decimal(10, 2), totalPrice)
-//         .input("CreatedBy", sql.Int, userId)
-//         .query(`
-//           INSERT INTO OrderDetails
-//           (OrderID, ProductID, Quantity, UnitPrice, TotalPrice, CreatedBy, CreatedDt)
-//           VALUES
-//           (@OrderID, @ProductID, @Quantity, @UnitPrice, @TotalPrice, @CreatedBy, GETDATE())
-//         `);
-//     }
-
-//     /* =========================
-//        3️⃣ AUTO CREATE DELIVERY
-//     ========================= */
-
-//     const expectedDate = new Date();
-//     expectedDate.setDate(expectedDate.getDate() + 5);
-
-//     const fullAddress = shippingAddress
-//   ? `
-//      ${shippingAddress.city || ""},
-//      ${shippingAddress.state || ""} - ${shippingAddress.pincode || ""}`
-//   : "Customer Address";
-
-//     await new sql.Request()
-//       .input("OrderID", sql.Int, orderId)
-//       .input("UserID", sql.Int, userId)
-//       .input("ShippingMode", sql.VarChar(50), "STANDARD")
-//       .input("FromLocation", sql.VarChar(100), "Main Warehouse")
-//       .input("ToLocation", sql.VarChar(100),  fullAddress)
-//       .input("DeliveryStatus", sql.VarChar(50), "ORDER_CONFIRMED")
-//       .input("ExpectedDeliveryDate", sql.DateTime, expectedDate)
-//       .input("CreatedBy", sql.Int, userId)
-//       .query(`
-//         INSERT INTO Delivery
-//         (
-//           OrderID,
-//           UserID,
-//           ShippingMode,
-//           FromLocation,
-//           ToLocation,
-//           DeliveryStatus,
-//           ExpectedDeliveryDate,
-//           CreatedBy,
-//           CreatedDt
-//         )
-//         VALUES
-//         (
-//           @OrderID,
-//           @UserID,
-//           @ShippingMode,
-//           @FromLocation,
-//           @ToLocation,
-//           @DeliveryStatus,
-//           @ExpectedDeliveryDate,
-//           @CreatedBy,
-//           GETDATE()
-//         )
-//       `);
-
-//     /* =========================
-//        4️⃣ AUTO GENERATE INVOICE
-//     ========================= */
-
-//      /* =========================
-//    AUTO GENERATE INVOICE
-// ========================= */
-
-// await generateInvoice({
-//   orderId,
-//   userId,
-//   shippingAddress: `${shippingAddress?.addressLine || ""}, ${shippingAddress?.city || ""}`,
-//   items: cartItems.map(item => ({
-//     name: item.productName || `Product ${item.productId}`,
-//     quantity: item.quantity,
-//     unitPrice: item.unitPrice,
-//     total: item.unitPrice * item.quantity
-//   })),
-//   subtotal: totalAmount - taxAmount,
-//   tax: taxAmount,
-//   totalAmount
-// });
-
-
-//     /* =========================
-//        5️⃣ RESPONSE
-//     ========================= */
-
-//     res.json({
-//       success: true,
-//       orderId,
-//       invoiceUrl: `http://localhost:4000/api/order/${orderId}/invoice`,
-//       message: "Order + Delivery + Invoice created successfully"
-//     });
-
-//   } catch (err) {
-//     console.error("❌ ORDER CREATE ERROR:", err);
-//     res.status(500).json({
-//       message: "Order creation failed",
-//       error: err.message
-//     });
-//   }
-// });
-
-// app.get("/api/order/:orderId", async (req, res) => {
-//   try {
-//     const { orderId } = req.params;
-
-//     // 1️⃣ Get order master
-//     const orderResult = await new sql.Request()
-//       .input("OrderID", sql.Int, orderId)
-//       .query(`
-//         SELECT 
-//           o.OrderID,
-//           o.OrderDate,
-//           o.TotalAmount,
-//           o.TaxAmount,
-//           o.PaymentMode,
-//           o.PaymentStatus,
-//           o.OrderStatus
-//         FROM OrderMaster o
-//         WHERE o.OrderID = @OrderID
-//       `);
-
-//     if (orderResult.recordset.length === 0) {
-//       return res.status(404).json({ message: "Order not found" });
-//     }
-
-//     const order = orderResult.recordset[0];
-
-//     // 2️⃣ Get order items
-//     const itemsResult = await new sql.Request()
-//       .input("OrderID", sql.Int, orderId)
-//       .query(`
-//         SELECT 
-//           p.ProductName,
-//           od.Quantity,
-//           od.UnitPrice,
-//           od.TotalPrice
-//         FROM OrderDetails od
-//         JOIN ProductMaster p ON od.ProductID = p.ProductID
-//         WHERE od.OrderID = @OrderID
-//       `);
-
-//     const items = itemsResult.recordset.map(item => ({
-//       productName: item.ProductName,
-//       weight: "200gms", // or from DB
-//       qty: item.Quantity,
-//       price: item.TotalPrice,
-//       // imageUrl: item.ProductImage || "https://via.placeholder.com/60"
-//     }));
-
-//     // 3️⃣ Response
-//     res.json({
-//       orderId: order.OrderID,
-//       transactionDate: new Date(order.OrderDate).toDateString(),
-//       paymentMethod: order.PaymentMode,
-//       shippingMethod: "Shiprocket",
-//       subtotal: order.TotalAmount,
-//       gst: order.TaxAmount,
-//       shipping: 40,
-//       total: order.TotalAmount + order.TaxAmount + 40,
-//       items
-//     });
-
-//   } catch (err) {
-//     console.error("❌ ORDER FETCH ERROR:", err);
-//     res.status(500).json({
-//       message: "Failed to fetch order",
-//       error: err.message
-//     });
-//   }
-// });
-
-
-
-// app.post("/api/order/create", async (req, res) => {
-//   const transaction = new sql.Transaction();
-
-//   try {
-//     const {
-//       userId,
-//       cartItems,
-//       subTotalAmount,
-//       discountAmount,
-//       couponDiscount,
-//       couponCode,
-//       totalAmount,
-//       taxAmount,
-//       paymentMode,
-//       shippingAddress
-//     } = req.body;
-
-//     if (!userId) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "UserId is required"
-//       });
-//     }
-
-//     if (!cartItems || cartItems.length === 0) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Cart is empty"
-//       });
-//     }
-
-//     if (!shippingAddress) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Shipping address required"
-//       });
-//     }
-
-//     await transaction.begin();
-
-//     const request = new sql.Request(transaction);
-
-//     /* =========================
-//        0️⃣ GET USER DETAILS
-//     ========================= */
-
-//     const userResult = await new sql.Request(transaction)
-//       .input("UserID", sql.Int, userId)
-//       .query(`
-//         SELECT TOP 1
-//           UserID,
-//           FirstName,
-//           LastName
-//         FROM UserMaster
-//         WHERE UserID = @UserID
-//       `);
-
-//     if (userResult.recordset.length === 0) {
-//       throw new Error("User not found");
-//     }
-
-//     const user = userResult.recordset[0];
-
-//     const userDisplayName =
-//       `${user.FirstName || ""} ${user.LastName || ""}`.trim() || "Customer";
-
-//     /* =========================
-//        0️⃣ GET DEFAULT BILLING ADDRESS
-//     ========================= */
-
-//     const defaultAddressResult = await new sql.Request(transaction)
-//       .input("UserID", sql.Int, userId)
-//       .query(`
-//         SELECT TOP 1
-//           AddressID,
-//           UserID,
-//           FullName,
-//           MobileNumber,
-//           AddressLine1,
-//           AddressLine2,
-//           Landmark,
-//           City,
-//           State,
-//           Country,
-//           Pincode,
-//           AddressType,
-//           IsDefault
-//         FROM Address
-//         WHERE UserID = @UserID
-//           AND IsDefault = 1
-//         ORDER BY AddressID DESC
-//       `);
-
-//     const defaultAddress = defaultAddressResult.recordset[0] || null;
-
-//     const billingName =  userDisplayName;
-
-//     const billingAddress = defaultAddress
-//       ? [
-//           defaultAddress.AddressLine1 || "",
-//           defaultAddress.AddressLine2 || "",
-//           defaultAddress.Landmark || "",
-//           defaultAddress.City || "",
-//           defaultAddress.State || "",
-//           defaultAddress.Country || "",
-//           defaultAddress.Pincode || ""
-//         ]
-//           .filter(Boolean)
-//           .join(", ")
-//       : "N/A";
-
-//     /* =========================
-//        SHIPPING DETAILS
-//     ========================= */
-
-//     const shippingName = shippingAddress.name || billingName;
-
-//     const shippingAddressText = [
-//       shippingAddress.flat || "",
-//       shippingAddress.street || "",
-//       shippingAddress.landmark || "",
-//       shippingAddress.city || "",
-//       shippingAddress.state || "",
-//       shippingAddress.pincode || ""
-//     ]
-//       .filter(Boolean)
-//       .join(", ");
-
-//     const fullAddress = `
-// ${shippingName}
-// Ph: ${shippingAddress.mobile || ""}
-// ${shippingAddress.flat || ""}
-// ${shippingAddress.street || ""}
-// ${shippingAddress.landmark || ""}
-// ${shippingAddress.city || ""}
-// ${shippingAddress.state || ""} - ${shippingAddress.pincode || ""}
-// `.trim();
-
-//     /* =========================
-//        1️⃣ CREATE ORDER MASTER
-//     ========================= */
-
-//     const orderResult = await request
-//       .input("UserID", sql.Int, userId)
-//       .input("SubTotalAmount", sql.Decimal(10, 2), subTotalAmount)
-//       .input("DiscountAmount", sql.Decimal(10, 2), discountAmount || 0)
-//       .input("CouponCode", sql.NVarChar(50), couponCode || null)
-//       .input("CouponDiscount", sql.Decimal(10, 2), couponDiscount || 0)
-//       .input("TotalAmount", sql.Decimal(10, 2), totalAmount)
-//       .input("TaxAmount", sql.Decimal(10, 2), taxAmount || 0)
-//       .input("PaymentMode", sql.VarChar(20), paymentMode || "COD")
-//       .input("PaymentStatus", sql.VarChar(20), "SUCCESS")
-//       .input("OrderStatus", sql.VarChar(20), "CONFIRMED")
-//       .input("CreatedBy", sql.Int, userId)
-//       .query(`
-//         INSERT INTO OrderMaster
-//         (
-//           UserID,
-//           OrderDate,
-//           SubTotalAmount,
-//           DiscountAmount,
-//           CouponCode,
-//           CouponDiscount,
-//           TotalAmount,
-//           TaxAmount,
-//           PaymentMode,
-//           PaymentStatus,
-//           OrderStatus,
-//           CreatedBy,
-//           CreatedDt
-//         )
-//         OUTPUT INSERTED.OrderID
-//         VALUES
-//         (
-//           @UserID,
-//           GETDATE(),
-//           @SubTotalAmount,
-//           @DiscountAmount,
-//           @CouponCode,
-//           @CouponDiscount,
-//           @TotalAmount,
-//           @TaxAmount,
-//           @PaymentMode,
-//           @PaymentStatus,
-//           @OrderStatus,
-//           @CreatedBy,
-//           GETDATE()
-//         )
-//       `);
-
-//     const orderId = orderResult.recordset[0].OrderID;
-
-//     /* =========================
-//        2️⃣ INSERT ORDER DETAILS
-//     ========================= */
-
-//     for (const item of cartItems) {
-//       const unitPrice = item.unitPrice;
-//       const quantity = item.quantity;
-//       const totalPrice = item.totalPrice || unitPrice * quantity;
-
-//       await new sql.Request(transaction)
-//         .input("OrderID", sql.Int, orderId)
-//         .input("ProductID", sql.Int, item.productId)
-//         .input("Quantity", sql.Int, quantity)
-//         .input("UnitPrice", sql.Decimal(10, 2), unitPrice)
-//         .input("TotalPrice", sql.Decimal(10, 2), totalPrice)
-//         .input("CreatedBy", sql.Int, userId)
-//         .query(`
-//           INSERT INTO OrderDetails
-//           (
-//             OrderID,
-//             ProductID,
-//             Quantity,
-//             UnitPrice,
-//             TotalPrice,
-//             CreatedBy,
-//             CreatedDt
-//           )
-//           VALUES
-//           (
-//             @OrderID,
-//             @ProductID,
-//             @Quantity,
-//             @UnitPrice,
-//             @TotalPrice,
-//             @CreatedBy,
-//             GETDATE()
-//           )
-//         `);
-//     }
-
-//     /* =========================
-//        3️⃣ CREATE DELIVERY
-//     ========================= */
-
-//     const expectedDate = new Date();
-//     expectedDate.setDate(expectedDate.getDate() + 5);
-
-//     const cityAddress = `
-// ${shippingAddress.city || ""},
-// ${shippingAddress.state || ""} - ${shippingAddress.pincode || ""}
-// `.trim();
-
-//     await new sql.Request(transaction)
-//       .input("OrderID", sql.Int, orderId)
-//       .input("UserID", sql.Int, userId)
-//       .input("ShippingMode", sql.VarChar(50), "STANDARD")
-//       .input("FromLocation", sql.VarChar(100), "Main Warehouse")
-//       .input("ToLocation", sql.NVarChar(500), cityAddress)
-//       .input("DeliveryStatus", sql.VarChar(50), "ORDER_CONFIRMED")
-//       .input("ExpectedDeliveryDate", sql.DateTime, expectedDate)
-//       .input("CreatedBy", sql.Int, userId)
-//       .query(`
-//         INSERT INTO Delivery
-//         (
-//           OrderID,
-//           UserID,
-//           ShippingMode,
-//           FromLocation,
-//           ToLocation,
-//           DeliveryStatus,
-//           ExpectedDeliveryDate,
-//           CreatedBy,
-//           CreatedDt
-//         )
-//         VALUES
-//         (
-//           @OrderID,
-//           @UserID,
-//           @ShippingMode,
-//           @FromLocation,
-//           @ToLocation,
-//           @DeliveryStatus,
-//           @ExpectedDeliveryDate,
-//           @CreatedBy,
-//           GETDATE()
-//         )
-//       `);
-
-//     /* =========================
-//        4️⃣ GENERATE INVOICE
-//     ========================= */
-
-//     const InvoiceNo = `${Date.now()}-${orderId}`;
-
-//     await generateInvoice({
-//       InvoiceNo,
-//       orderId,
-//       userId,
-
-//       billingName,
-//       billingAddress,
-
-//       shippingName,
-//       shippingAddress: shippingAddressText,
-
-//       items: cartItems.map(item => ({
-//         name: item.productName || `Product ${item.productId}`,
-//         quantity: item.quantity,
-//         unitPrice: item.unitPrice,
-//         total: item.totalPrice || (item.unitPrice * item.quantity)
-//       })),
-
-//       subtotal: subTotalAmount,
-//       discount: (discountAmount || 0) + (couponDiscount || 0),
-//       tax: taxAmount || 0,
-//       totalAmount
-//     });
-
-//     await new sql.Request(transaction)
-//       .input("OrderID", sql.Int, orderId)
-//       .input("InvoiceNo", sql.VarChar(50), InvoiceNo)
-//       .query(`
-//         UPDATE OrderMaster
-//         SET InvoiceNo = @InvoiceNo
-//         WHERE OrderID = @OrderID
-//       `);
-
-//     /* =========================
-//        5️⃣ CLEAR USER CART
-//     ========================= */
-
-//     // await new sql.Request(transaction)
-//     //   .input("UserID", sql.Int, userId)
-//     //   .query(`
-//     //     DELETE FROM Cart
-//     //     WHERE UserID = @UserID
-//     //   `);
-//     /* =========================
-//    5️⃣ CLEAR USER CART (ONLY FOR COD)
-// ========================= */
-
-// if (paymentMode === "COD") {
-//   await new sql.Request(transaction)
-//     .input("UserID", sql.Int, userId)
-//     .query(`
-//       DELETE FROM Cart
-//       WHERE UserID = @UserID
-//     `);
-// }
-
-//     await transaction.commit();
-
-//     res.json({
-//       success: true,
-//       orderId,
-//       invoiceUrl: `http://localhost:4000/api/order/${orderId}/invoice`,
-//       message: "Order + Delivery + Invoice created successfully"
-//     });
-
-//   } catch (err) {
-//     if (transaction) {
-//       await transaction.rollback();
-//     }
-
-//     console.error("❌ ORDER CREATE ERROR:", err);
-
-//     res.status(500).json({
-//       success: false,
-//       message: "Order creation failed",
-//       error: err.message
-//     });
-//   }
-// });
-
-// app.post("/api/order/create", async (req, res) => {
-//   const transaction = new sql.Transaction();
-
-//   try {
-//     const {
-//       userId,
-//       cartItems,
-//       subTotalAmount,
-//       discountAmount,
-//       couponDiscount,
-//       couponCode,
-//       totalAmount,
-//       taxAmount,
-//       paymentMode,
-//       shippingAddress
-//     } = req.body;
-
-//     if (!userId) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "UserId is required"
-//       });
-//     }
-
-//     if (!cartItems || cartItems.length === 0) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Cart is empty"
-//       });
-//     }
-
-//     if (!shippingAddress) {
-//       return res.status(400).json({
-//         success: false,
-//         message: "Shipping address required"
-//       });
-//     }
-
-//     await transaction.begin();
-
-//     const request = new sql.Request(transaction);
-
-//     /* =========================
-//        0️⃣ GET USER DETAILS
-//     ========================= */
-
-//     const userResult = await new sql.Request(transaction)
-//       .input("UserID", sql.Int, userId)
-//       .query(`
-//         SELECT TOP 1
-//           UserID,
-//           FirstName,
-//           LastName
-//         FROM UserMaster
-//         WHERE UserID = @UserID
-//       `);
-
-//     if (userResult.recordset.length === 0) {
-//       throw new Error("User not found");
-//     }
-
-//     const user = userResult.recordset[0];
-
-//     const userDisplayName =
-//       `${user.FirstName || ""} ${user.LastName || ""}`.trim() || "Customer";
-
-//     /* =========================
-//        0️⃣ GET DEFAULT BILLING ADDRESS
-//     ========================= */
-
-//     const defaultAddressResult = await new sql.Request(transaction)
-//       .input("UserID", sql.Int, userId)
-//       .query(`
-//         SELECT TOP 1
-//           AddressID,
-//           UserID,
-//           FullName,
-//           MobileNumber,
-//           AddressLine1,
-//           AddressLine2,
-//           Landmark,
-//           City,
-//           State,
-//           Country,
-//           Pincode,
-//           AddressType,
-//           IsDefault
-//         FROM Address
-//         WHERE UserID = @UserID
-//           AND IsDefault = 1
-//         ORDER BY AddressID DESC
-//       `);
-
-//     const defaultAddress = defaultAddressResult.recordset[0] || null;
-
-//     const billingName = userDisplayName;
-
-//     const billingAddress = defaultAddress
-//       ? [
-//           defaultAddress.AddressLine1 || "",
-//           defaultAddress.AddressLine2 || "",
-//           defaultAddress.Landmark || "",
-//           defaultAddress.City || "",
-//           defaultAddress.State || "",
-//           defaultAddress.Country || "",
-//           defaultAddress.Pincode || ""
-//         ]
-//           .filter(Boolean)
-//           .join(", ")
-//       : "N/A";
-
-//     /* =========================
-//        SHIPPING DETAILS
-//     ========================= */
-
-//     const shippingName = shippingAddress.name || billingName;
-
-//     const shippingAddressText = [
-//       shippingAddress.flat || "",
-//       shippingAddress.street || "",
-//       shippingAddress.landmark || "",
-//       shippingAddress.city || "",
-//       shippingAddress.state || "",
-//       shippingAddress.pincode || ""
-//     ]
-//       .filter(Boolean)
-//       .join(", ");
-
-//     /* =========================
-//        1️⃣ CREATE ORDER MASTER
-//     ========================= */
-
-//     const orderResult = await request
-//       .input("UserID", sql.Int, userId)
-//       .input("SubTotalAmount", sql.Decimal(10, 2), subTotalAmount)
-//       .input("DiscountAmount", sql.Decimal(10, 2), discountAmount || 0)
-//       .input("CouponCode", sql.NVarChar(50), couponCode || null)
-//       .input("CouponDiscount", sql.Decimal(10, 2), couponDiscount || 0)
-//       .input("TotalAmount", sql.Decimal(10, 2), totalAmount)
-//       .input("TaxAmount", sql.Decimal(10, 2), taxAmount || 0)
-//       .input("PaymentMode", sql.VarChar(20), paymentMode || "COD")
-//       .input("PaymentStatus", sql.VarChar(20), "SUCCESS")
-//       .input("OrderStatus", sql.VarChar(20), "CONFIRMED")
-//       .input("CreatedBy", sql.Int, userId)
-//       .query(`
-//         INSERT INTO OrderMaster
-//         (
-//           UserID,
-//           OrderDate,
-//           SubTotalAmount,
-//           DiscountAmount,
-//           CouponCode,
-//           CouponDiscount,
-//           TotalAmount,
-//           TaxAmount,
-//           PaymentMode,
-//           PaymentStatus,
-//           OrderStatus,
-//           CreatedBy,
-//           CreatedDt
-//         )
-//         OUTPUT INSERTED.OrderID
-//         VALUES
-//         (
-//           @UserID,
-//           GETDATE(),
-//           @SubTotalAmount,
-//           @DiscountAmount,
-//           @CouponCode,
-//           @CouponDiscount,
-//           @TotalAmount,
-//           @TaxAmount,
-//           @PaymentMode,
-//           @PaymentStatus,
-//           @OrderStatus,
-//           @CreatedBy,
-//           GETDATE()
-//         )
-//       `);
-
-//     const orderId = orderResult.recordset[0].OrderID;
-
-//     /* =========================
-//        2️⃣ INSERT ORDER DETAILS
-//        TAKE DISCOUNTPRICE FROM ProductPriceMaster
-//     ========================= */
-
-//     const invoiceItems = [];
-
-//     for (const item of cartItems) {
-//       const quantity = Number(item.quantity || 0);
-
-//       if (quantity <= 0) {
-//         throw new Error(`Invalid quantity for ProductID ${item.productId}`);
-//       }
-
-//       const priceResult = await new sql.Request(transaction)
-//         .input("ProductID", sql.Int, item.productId)
-//         .query(`
-//           SELECT TOP 1
-//             Price,
-//             DiscountPrice
-//           FROM ProductPriceMaster
-//           WHERE ProductID = @ProductID
-//           ORDER BY ValidFrom DESC, PriceID DESC
-//         `);
-
-//       if (priceResult.recordset.length === 0) {
-//         throw new Error(`Price not found for ProductID ${item.productId}`);
-//       }
-
-//       const priceRow = priceResult.recordset[0];
-
-//       const unitPrice = Number(priceRow.DiscountPrice || priceRow.Price || 0);
-
-//       if (unitPrice <= 0) {
-//         throw new Error(`Invalid price for ProductID ${item.productId}`);
-//       }
-
-//       const totalPrice = unitPrice * quantity;
-
-//       await new sql.Request(transaction)
-//         .input("OrderID", sql.Int, orderId)
-//         .input("ProductID", sql.Int, item.productId)
-//         .input("Quantity", sql.Int, quantity)
-//         .input("UnitPrice", sql.Decimal(10, 2), unitPrice)
-//         .input("TotalPrice", sql.Decimal(10, 2), totalPrice)
-//         .input("CreatedBy", sql.Int, userId)
-//         .query(`
-//           INSERT INTO OrderDetails
-//           (
-//             OrderID,
-//             ProductID,
-//             Quantity,
-//             UnitPrice,
-//             TotalPrice,
-//             CreatedBy,
-//             CreatedDt
-//           )
-//           VALUES
-//           (
-//             @OrderID,
-//             @ProductID,
-//             @Quantity,
-//             @UnitPrice,
-//             @TotalPrice,
-//             @CreatedBy,
-//             GETDATE()
-//           )
-//         `);
-
-//       invoiceItems.push({
-//         name: item.productName || `Product ${item.productId}`,
-//         quantity,
-//         unitPrice,
-//         total: totalPrice
-//       });
-//     }
-
-//     /* =========================
-//        3️⃣ CREATE DELIVERY
-//     ========================= */
-
-//     const expectedDate = new Date();
-//     expectedDate.setDate(expectedDate.getDate() + 5);
-
-//     const cityAddress = `
-// ${shippingAddress.city || ""},
-// ${shippingAddress.state || ""} - ${shippingAddress.pincode || ""}
-// `.trim();
-
-//     await new sql.Request(transaction)
-//       .input("OrderID", sql.Int, orderId)
-//       .input("UserID", sql.Int, userId)
-//       .input("ShippingMode", sql.VarChar(50), "STANDARD")
-//       .input("FromLocation", sql.VarChar(100), "Main Warehouse")
-//       .input("ToLocation", sql.NVarChar(500), cityAddress)
-//       .input("DeliveryStatus", sql.VarChar(50), "ORDER_CONFIRMED")
-//       .input("ExpectedDeliveryDate", sql.DateTime, expectedDate)
-//       .input("CreatedBy", sql.Int, userId)
-//       .query(`
-//         INSERT INTO Delivery
-//         (
-//           OrderID,
-//           UserID,
-//           ShippingMode,
-//           FromLocation,
-//           ToLocation,
-//           DeliveryStatus,
-//           ExpectedDeliveryDate,
-//           CreatedBy,
-//           CreatedDt
-//         )
-//         VALUES
-//         (
-//           @OrderID,
-//           @UserID,
-//           @ShippingMode,
-//           @FromLocation,
-//           @ToLocation,
-//           @DeliveryStatus,
-//           @ExpectedDeliveryDate,
-//           @CreatedBy,
-//           GETDATE()
-//         )
-//       `);
-
-//     /* =========================
-//        4️⃣ GENERATE INVOICE
-//     ========================= */
-
-//     const InvoiceNo = `${Date.now()}-${orderId}`;
-
-//     await generateInvoice({
-//       InvoiceNo,
-//       orderId,
-//       userId,
-//       billingName,
-//       billingAddress,
-//       shippingName,
-//       shippingAddress: shippingAddressText,
-//       items: invoiceItems,
-//       subtotal: subTotalAmount,
-//       discount: (discountAmount || 0) + (couponDiscount || 0),
-//       tax: taxAmount || 0,
-//       totalAmount
-//     });
-
-//     await new sql.Request(transaction)
-//       .input("OrderID", sql.Int, orderId)
-//       .input("InvoiceNo", sql.VarChar(50), InvoiceNo)
-//       .query(`
-//         UPDATE OrderMaster
-//         SET InvoiceNo = @InvoiceNo
-//         WHERE OrderID = @OrderID
-//       `);
-
-//     /* =========================
-//        5️⃣ CLEAR USER CART (ONLY FOR COD)
-//     ========================= */
-
-//     if (paymentMode === "COD") {
-//       await new sql.Request(transaction)
-//         .input("UserID", sql.Int, userId)
-//         .query(`
-//           DELETE FROM Cart
-//           WHERE UserID = @UserID
-//         `);
-//     }
-
-//     await transaction.commit();
-
-//     res.json({
-//       success: true,
-//       orderId,
-//       invoiceUrl: `http://localhost:4000/api/order/${orderId}/invoice`,
-//       message: "Order + Delivery + Invoice created successfully"
-//     });
-
-//   } catch (err) {
-//     try {
-//       await transaction.rollback();
-//     } catch (rollbackErr) {
-//       console.error("❌ ROLLBACK ERROR:", rollbackErr);
-//     }
-
-//     console.error("❌ ORDER CREATE ERROR:", err);
-
-//     res.status(500).json({
-//       success: false,
-//       message: "Order creation failed",
-//       error: err.message
-//     });
-//   }
-// });
 
 app.post("/api/order/create", async (req, res) => {
   const transaction = new sql.Transaction();
@@ -3749,6 +2715,7 @@ app.post("/api/order/create", async (req, res) => {
         .query(`
           SELECT TOP 1
               p.ProductName,
+               p.VendorID,
             ISNULL(ppm.Price, 0) AS Price,
             ISNULL(ppm.DiscountPrice, 0) AS DiscountPrice,
             ISNULL(pc.GSTPercent, 0) AS GSTPercent
@@ -3771,6 +2738,7 @@ app.post("/api/order/create", async (req, res) => {
       }
 
       const productRow = productResult.recordset[0];
+      const vendorId = productRow.VendorID;
 
       const productName = productRow.ProductName || `Product ${item.productId}`;  
 
@@ -3787,6 +2755,7 @@ app.post("/api/order/create", async (req, res) => {
       await new sql.Request(transaction)
         .input("OrderID", sql.Int, orderId)
         .input("ProductID", sql.Int, item.productId)
+         .input("VendorID", sql.Int, vendorId)
         .input("Quantity", sql.Int, quantity)
         .input("UnitPrice", sql.Decimal(10, 2), unitPrice)
         .input("TotalPrice", sql.Decimal(10, 2), totalPrice)
@@ -3798,6 +2767,7 @@ app.post("/api/order/create", async (req, res) => {
           (
             OrderID,
             ProductID,
+            VendorID,
             Quantity,
             UnitPrice,
             TotalPrice,
@@ -3810,6 +2780,7 @@ app.post("/api/order/create", async (req, res) => {
           (
             @OrderID,
             @ProductID,
+            @VendorID,
             @Quantity,
             @UnitPrice,
             @TotalPrice,
@@ -3846,7 +2817,7 @@ ${shippingAddress.state || ""} - ${shippingAddress.pincode || ""}
       .input("UserID", sql.Int, userId)
       .input("ShippingMode", sql.VarChar(50), "STANDARD")
       .input("FromLocation", sql.VarChar(100), "Main Warehouse")
-      .input("ToLocation", sql.NVarChar(500), cityAddress)
+      .input("ToLocation", sql.NVarChar(500), shippingAddressText)
       .input("DeliveryStatus", sql.VarChar(50), "ORDER_CONFIRMED")
       .input("ExpectedDeliveryDate", sql.DateTime, expectedDate)
       .input("CreatedBy", sql.Int, userId)
@@ -4115,8 +3086,20 @@ app.get("/api/order/:orderId", async (req, res) => {
           o.TaxAmount,
           o.PaymentMode,
           o.PaymentStatus,
-          o.OrderStatus
+          o.OrderStatus,
+            a.FullName,
+
+  CONCAT(
+    a.AddressLine1, ', ',
+    a.AddressLine2, ', ',
+    a.City, ', ',
+    a.State, ' - ',
+    a.Pincode
+  ) AS DeliveryAddress
+
         FROM OrderMaster o
+       LEFT JOIN Address a
+ON o.UserID = a.UserID
         WHERE o.OrderID = @OrderID
       `);
 
@@ -4168,7 +3151,8 @@ app.get("/api/order/:orderId", async (req, res) => {
       transactionDate: new Date(order.OrderDate).toDateString(),
       paymentMethod: order.PaymentMode,
       shippingMethod: "Shiprocket",
-
+         customerName: order.FullName,
+  deliveryAddress: order.DeliveryAddress,
       subtotal: order.SubTotalAmount,
       discount: order.DiscountAmount,
       couponDiscount:order.CouponDiscount,
@@ -4378,7 +3362,210 @@ app.get("/api/orders/user/:userId", async (req, res) => {
   }
 });
 
+app.get("/api/order/details/:orderId", async (req, res) => {
 
+  try {
+
+    const { orderId } = req.params;
+
+    const pool = await sql.connect(dbConfig);
+
+    /* ORDER + USER + DELIVERY + ADDRESS */
+
+    const orderResult = await pool.request()
+      .input("OrderID", sql.Int, orderId)
+      .query(`
+
+        SELECT 
+
+          o.OrderID,
+          o.OrderDate,
+          o.TotalAmount,
+          o.SubTotalAmount,
+          o.TaxAmount,
+          o.DiscountAmount,
+          o.CouponDiscount,
+          o.InvoiceNo,
+          o.PaymentMode,
+          o.TransactionID,
+          o.PaymentStatus,
+          o.OrderStatus,
+
+          u.FirstName,
+          u.ContactNo,
+          u.Email,
+
+          d.ExpectedDeliveryDate,
+          d.DeliveryStatus,
+
+          a.FullName,
+          a.MobileNumber,
+          a.AddressLine1,
+          a.AddressLine2,
+          a.City,
+          a.State,
+          a.Pincode,
+          a.AddressType
+
+        FROM OrderMaster o
+
+        LEFT JOIN Delivery d
+        ON o.OrderID = d.OrderID
+
+        LEFT JOIN UserMaster u
+        ON o.UserID = u.UserID
+
+        LEFT JOIN Address a
+        ON o.UserID = a.UserID
+        AND a.IsDefault = 1
+
+        WHERE o.OrderID = @OrderID
+
+      `);
+
+    if (!orderResult.recordset.length) {
+
+      return res.status(404).json({
+        success: false,
+        message: "Order not found"
+      });
+
+    }
+
+    const order = orderResult.recordset[0];
+
+    /* ITEMS */
+
+    const itemsResult = await pool.request()
+      .input("OrderID", sql.Int, orderId)
+      .query(`
+
+        SELECT 
+
+          p.ProductName,
+          p.ProductWeight,
+
+          od.Quantity,
+          od.UnitPrice,
+          od.TotalPrice,
+
+          (
+            SELECT TOP 1 AttachmentFile
+            FROM Attachments a
+            WHERE a.ProductID = p.ProductID
+            ORDER BY a.SortOrder ASC
+          ) AS ImageUrl
+
+        FROM OrderDetails od
+
+        JOIN ProductMaster p
+        ON od.ProductID = p.ProductID
+
+        WHERE od.OrderID = @OrderID
+
+      `);
+
+    const items = itemsResult.recordset.map(item => ({
+
+      productName: item.ProductName,
+
+      weight: item.ProductWeight,
+
+      qty: item.Quantity,
+
+      unitPrice: item.UnitPrice,
+
+      totalPrice: item.TotalPrice,
+
+      imageUrl: item.ImageUrl
+        ? `http://localhost:4000${item.ImageUrl}`
+        : null
+
+    }));
+
+    res.json({
+
+      success: true,
+
+      data: {
+
+        orderId: order.OrderID,
+
+        orderDate: order.OrderDate,
+
+        expectedDeliveryDate:
+          order.ExpectedDeliveryDate,
+
+        deliveryStatus:
+          order.DeliveryStatus,
+
+        paymentMode:
+          order.PaymentMode,
+
+        paymentStatus:
+          order.PaymentStatus,
+
+        orderStatus:
+          order.OrderStatus,
+
+        totalAmount:
+          order.TotalAmount,
+
+        subtotal:
+          order.SubTotalAmount,
+
+        taxAmount:
+          order.TaxAmount,
+
+        discountAmount:
+          order.DiscountAmount,
+
+        couponDiscount:
+          order.CouponDiscount,
+
+        invoiceNo:
+          order.InvoiceNo,
+
+        transactionId:
+          order.TransactionID,
+
+        customerName:
+          order.FullName,
+
+        mobile:
+          order.MobileNumber,
+
+        email:
+          order.Email,
+
+        addressType:
+          order.AddressType,
+
+        deliveryAddress: `${order.AddressLine1},
+${order.AddressLine2},
+${order.City},
+${order.State} - ${order.Pincode}`,
+
+        items
+
+      }
+
+    });
+
+  } catch (err) {
+
+    console.error(
+      "❌ ORDER DETAILS ERROR:",
+      err
+    );
+
+    res.status(500).json({
+      success: false
+    });
+
+  }
+
+});
 
 app.get("/api/order/:orderId/invoice", (req, res) => {
   const { orderId } = req.params;
@@ -4680,11 +3867,23 @@ app.get("/api/delivery/track/:orderId", async (req, res) => {
         message: "Delivery not found"
       });
     }
-
+    
+    const d=result.recordset[0]
     res.json({
       success: true,
-      delivery: result.recordset[0]
+        delivery: {
+    deliveryId: d.DeliveryID,
+    orderId: d.OrderID,
+    userId: d.UserID,
+    shippingMode: d.ShippingMode,
+    fromLocation: d.FromLocation,
+    toLocation: d.ToLocation,
+    deliveryStatus: d.DeliveryStatus,
+    expectedDeliveryDate: d.ExpectedDeliveryDate,
+    createdDate: d.CreatedDt
+  }
     });
+    
 
   } catch (error) {
     console.error("❌ TRACK ERROR:", error);
@@ -6792,4 +5991,1159 @@ app.get("/api/product-full-details/:productId", async (req, res) => {
       error: error.message
     });
   }
+});
+
+
+app.get("/api/home-products/:section", async (req, res) => {
+  try {
+    const { section } = req.params;
+
+    const pool = await sql.connect(dbConfig);
+
+    const query = `
+      SELECT 
+        p.ProductID,
+        p.ProductName,
+        p.ProductDescription,
+        p.ProductWeight,
+        p.HomeSection,
+        c.CategoryName,
+
+        ISNULL(pp.Price, 0) AS Price,
+        ISNULL(pp.DiscountPrice, 0) AS DiscountPrice,
+
+        (
+          SELECT TOP 1 AttachmentFile
+          FROM Attachments a
+          WHERE a.ProductID = p.ProductID
+          ORDER BY a.SortOrder ASC
+        ) AS ImageUrl
+
+      FROM ProductMaster p
+
+      LEFT JOIN ProductCategory c 
+        ON p.ProductCategoryID = c.ProductCategoryID
+
+      LEFT JOIN ProductPriceMaster pp 
+        ON p.ProductID = pp.ProductID
+
+      WHERE 
+        p.Status = 1
+        AND p.HomeSection = @section
+
+      ORDER BY p.CreatedDt DESC
+    `;
+
+    const result = await pool.request()
+      .input("section", sql.VarChar(50), section)
+      .query(query);
+
+    const products = result.recordset.map(item => ({
+      ProductID: item.ProductID,
+      ProductName: item.ProductName,
+      ProductDescription: item.ProductDescription,
+      ProductWeight: item.ProductWeight,
+      CategoryName: item.CategoryName,
+      Price: item.DiscountPrice || item.Price,
+      ImageUrl: item.ImageUrl
+        ? `http://localhost:4000${item.ImageUrl}`
+        : null
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products
+    });
+
+  } catch (err) {
+    console.error("❌ HOME PRODUCTS ERROR:", err);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch home products",
+      error: err.message
+    });
+  }
+});
+
+app.post(
+
+"/api/vendor/register",
+
+vendorUpload.none(),
+
+async(req,res)=>{
+
+try{
+
+const vendor=req.body;
+
+console.log(vendor);
+
+const result=
+await sql.query(`
+
+INSERT INTO VendorMaster(
+
+BusinessName,
+BrandName,
+BusinessType,
+Category,
+GSTNumber,
+FSSAINumber,
+BusinessDescription,
+
+StoreName,
+StoreAddress,
+PickupAddress,
+State,
+City,
+Pincode,
+
+ContactPerson,
+Designation,
+Email,
+PhoneNumber,
+AlternatePhone,
+
+PANNumber,
+AadhaarNumber,
+CommunicationAddress,
+
+PreferredCommunication,
+
+VendorStatus,
+IsApproved,
+IsActive,
+CreatedDt
+
+)
+
+OUTPUT INSERTED.VendorID
+
+VALUES(
+
+'${vendor.businessName||""}',
+'${vendor.brandName||""}',
+'${vendor.businessType||""}',
+'${vendor.category||""}',
+'${vendor.gstNumber||""}',
+'${vendor.fssaiNumber||""}',
+'${vendor.businessDescription||""}',
+
+'${vendor.storeName||""}',
+'${vendor.storeAddress||""}',
+'${vendor.pickupAddress||""}',
+
+'${vendor.state||""}',
+'${vendor.city||""}',
+'${vendor.pincode||""}',
+
+'${vendor.contactPerson||""}',
+'${vendor.designation||""}',
+'${vendor.email||""}',
+'${vendor.phoneNumber||""}',
+'${vendor.alternatePhone||""}',
+
+'${vendor.panNumber||""}',
+'${vendor.aadhaarNumber||""}',
+'${vendor.communicationAddress||""}',
+
+'${vendor.preferredCommunication||""}',
+
+'Pending',
+0,
+1,
+GETDATE()
+
+)
+
+`);
+
+res.json({
+
+success:true,
+vendorId:
+result.recordset[0].VendorID
+
+});
+
+}
+catch(err){
+
+console.log(err);
+
+res.status(500).json({
+
+success:false,
+message:err.message
+
+});
+
+}
+
+});
+
+
+app.post(
+
+"/api/vendor/documents",
+
+vendorUpload.fields([
+
+{name:"gst"},
+{name:"fssai"},
+{name:"businessRegistration"},
+{name:"pan"},
+{name:"address"},
+{name:"passbook"}
+
+]),
+
+async(req,res)=>{
+
+try{
+
+const vendorId=req.body.vendorId;
+
+await sql.query(`
+
+INSERT INTO VendorDocuments(
+
+VendorID,
+GSTCertificate,
+FSSAILicense,
+BusinessRegistrationCertificate,
+PANCard,
+AddressProof,
+CancelChequeOrPassbook,
+CreatedDt
+
+)
+
+VALUES(
+
+${vendorId},
+
+'${req.files.gst?.[0]?.path||""}',
+'${req.files.fssai?.[0]?.path||""}',
+'${req.files.businessRegistration?.[0]?.path||""}',
+'${req.files.pan?.[0]?.path||""}',
+'${req.files.address?.[0]?.path||""}',
+'${req.files.passbook?.[0]?.path||""}',
+
+GETDATE()
+
+)
+
+`);
+
+res.json({
+
+success:true
+
+});
+
+}
+catch(err){
+
+console.log(err);
+
+res.status(500).json({
+success:false,
+message:err.message
+});
+
+}
+
+});
+
+
+app.get("/api/admin/vendors", async(req,res)=>{
+
+try{
+
+const result=await sql.query(`
+
+SELECT
+
+VendorID,
+BusinessName,
+BrandName,
+Category,
+City,
+State,
+VendorStatus,
+CreatedDt,
+
+ContactPerson,
+Email,
+
+CASE
+WHEN IsActive=1 THEN 'Active'
+ELSE 'Inactive'
+END AS Status
+
+FROM VendorMaster
+ORDER BY CreatedDt DESC
+
+`);
+
+const total=result.recordset.length;
+
+const active=result.recordset.filter(
+x=>x.Status==="Active"
+).length;
+
+const pending=result.recordset.filter(
+x=>x.VendorStatus==="Pending"
+).length;
+
+const suspended=result.recordset.filter(
+x=>x.Status==="Inactive"
+).length;
+
+
+res.json({
+
+success:true,
+
+stats:{
+
+total,
+active,
+pending,
+suspended
+
+},
+
+data:result.recordset
+
+});
+
+}
+catch(error){
+
+console.log(error);
+
+res.status(500).json({
+
+success:false,
+message:error.message
+
+});
+
+}
+
+});
+
+app.get("/api/admin/vendor-applications",async(req,res)=>{
+
+try{
+
+const result=await sql.query(`
+
+SELECT
+
+VM.VendorID,
+VM.BusinessName,
+VM.BusinessType,
+VM.Category,
+VM.ContactPerson,
+VM.PhoneNumber,
+VM.Email,
+VM.City,
+VM.State,
+VM.VendorStatus,
+VM.CreatedDt
+
+FROM VendorMaster VM
+ORDER BY VM.CreatedDt DESC
+
+`);
+
+res.json({
+
+success:true,
+data:result.recordset
+
+});
+
+}
+catch(error){
+
+console.log(error);
+
+res.status(500).json({
+
+success:false,
+message:error.message
+
+});
+
+}
+
+});
+
+app.get("/api/admin/vendor-details/:id", async (req, res) => {
+
+  try {
+
+    const vendorId = req.params.id;
+
+    const result = await sql.query(`
+
+      SELECT
+
+      VM.*,
+
+      VD.GSTCertificate,
+      VD.FSSAILicense,
+      VD.BusinessRegistrationCertificate,
+      VD.PANCard,
+      VD.AddressProof,
+      VD.CancelChequeOrPassbook,
+      VD.AadhaarDocument
+
+      FROM VendorMaster VM
+
+      LEFT JOIN VendorDocuments VD
+      ON VM.VendorID = VD.VendorID
+
+      WHERE VM.VendorID = ${vendorId}
+
+    `);
+
+    res.json({
+      success: true,
+      data: result.recordset[0]
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+
+});
+
+app.put("/api/admin/vendor-approve/:id", async (req, res) => {
+  try {
+
+    const vendorId = req.params.id;
+
+    await sql.query(`
+      UPDATE VendorMaster
+      SET
+        VendorStatus='Approved',
+        IsApproved=1,
+        IsActive=1
+      WHERE VendorID=${vendorId}
+    `);
+
+    res.json({
+      success: true,
+      message: "Vendor Approved"
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+});
+
+app.put("/api/admin/vendor-under-review/:id", async (req, res) => {
+
+  try {
+
+    const vendorId = req.params.id;
+
+    await sql.query(`
+      UPDATE VendorMaster
+      SET VendorStatus='UnderReview'
+      WHERE VendorID=${vendorId}
+    `);
+
+    res.json({
+      success: true
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false
+    });
+
+  }
+
+});
+
+app.put("/api/admin/vendor-reject/:id", async (req, res) => {
+
+  try {
+
+    const vendorId = req.params.id;
+
+    await sql.query(`
+      UPDATE VendorMaster
+      SET
+        VendorStatus='Rejected',
+        IsApproved=0,
+        IsActive=0
+      WHERE VendorID=${vendorId}
+    `);
+
+    res.json({
+      success: true
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false
+    });
+
+  }
+
+});
+
+app.get("/api/admin/top-categories", async (req, res) => {
+
+  try {
+
+    const pool = await sql.connect(dbConfig);
+
+    const result = await pool.request().query(`
+
+      SELECT TOP 5
+        CategoryName,
+        Status,
+        DisplayOrder,
+        CreatedDt
+      FROM ProductCategory
+      ORDER BY DisplayOrder ASC
+
+    `);
+
+    res.json({
+      success: true,
+      data: result.recordset
+    });
+
+  }
+  catch (err) {
+
+    console.error("Top categories error:", err);
+
+    res.status(500).json({
+      success: false,
+      message: "Server Error"
+    });
+
+  }
+
+});
+app.get("/api/admin/dashboard-stats", async (req, res) => {
+
+  try {
+
+    const vendorResult = await sql.query(`
+
+      SELECT
+      COUNT(*) TotalVendors,
+
+      SUM(
+      CASE
+      WHEN IsActive = 1
+      THEN 1
+      ELSE 0
+      END
+      ) ActiveVendors,
+
+      SUM(
+      CASE
+      WHEN VendorStatus='Pending'
+      THEN 1
+      ELSE 0
+      END
+      ) PendingApprovals
+
+      FROM VendorMaster
+
+    `);
+
+    const orderResult = await sql.query(`
+
+      SELECT
+      COUNT(*) TotalOrders,
+      ISNULL(SUM(TotalAmount),0) GMV
+      FROM OrderMaster
+
+    `);
+
+    res.json({
+
+      success: true,
+
+      stats: {
+
+        totalVendors:
+        vendorResult.recordset[0].TotalVendors,
+
+        activeVendors:
+        vendorResult.recordset[0].ActiveVendors,
+
+        pendingApprovals:
+        vendorResult.recordset[0].PendingApprovals,
+
+        totalOrders:
+        orderResult.recordset[0].TotalOrders,
+
+        gmv:
+        orderResult.recordset[0].GMV,
+
+        payouts:
+        0
+
+      }
+
+    });
+
+  }
+  catch (err) {
+
+    res.status(500).json({
+      success: false
+    });
+
+  }
+
+});
+
+app.get("/api/admin/recent-vendors", async (req, res) => {
+
+  try {
+
+    const result = await sql.query(`
+
+      SELECT TOP 5
+
+      VendorID,
+      BusinessName,
+      BusinessType,
+      VendorStatus,
+      CreatedDt
+
+      FROM VendorMaster
+
+      ORDER BY VendorID DESC
+
+    `);
+
+    res.json({
+      success: true,
+      data: result.recordset
+    });
+
+  }
+  catch (err) {
+
+    res.status(500).json({
+      success: false
+    });
+
+  }
+
+});
+
+app.get("/api/admin/recent-orders", async (req, res) => {
+
+  try {
+
+    const result = await sql.query(`
+
+      SELECT TOP 5
+
+      OrderID,
+      OrderDate,
+      TotalAmount,
+      OrderStatus
+
+      FROM OrderMaster
+
+      ORDER BY OrderID DESC
+
+    `);
+
+    res.json({
+      success: true,
+      data: result.recordset
+    });
+
+  }
+  catch (err) {
+
+    res.status(500).json({
+      success: false
+    });
+
+  }
+
+});
+
+// app.get("/api/admin/vendor-distribution", async (req, res) => {
+
+//   try {
+
+//     const result = await sql.query(`
+
+//       SELECT
+
+//       VendorStatus,
+//       COUNT(*) Count
+
+//       FROM VendorMaster
+
+//       GROUP BY VendorStatus
+
+//     `);
+
+//     res.json({
+//       success: true,
+//       data: result.recordset
+//     });
+
+//   }
+//   catch (err) {
+
+//     res.status(500).json({
+//       success: false
+//     });
+
+//   }
+
+// });
+
+app.get("/api/admin/vendor-distribution", async (req, res) => {
+
+  try {
+
+    const result = await sql.query(`
+
+      SELECT
+
+      CASE
+
+        WHEN VendorStatus IN (
+          'Under Review',
+          'Pending'
+        )
+        THEN 'Pending'
+
+        WHEN VendorStatus IN (
+          'Approved',
+          'Active'
+        )
+        THEN 'Active'
+
+        ELSE VendorStatus
+
+      END AS VendorStatus,
+
+      COUNT(*) AS Count
+
+      FROM VendorMaster
+
+      GROUP BY
+
+      CASE
+
+        WHEN VendorStatus IN (
+          'Under Review',
+          'Pending'
+        )
+        THEN 'Pending'
+
+        WHEN VendorStatus IN (
+          'Approved',
+          'Active'
+        )
+        THEN 'Active'
+
+        ELSE VendorStatus
+
+      END
+
+    `);
+
+    res.json({
+      success: true,
+      data: result.recordset
+    });
+
+  }
+  catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      success: false
+    });
+
+  }
+
+});
+
+app.get("/api/admin/active-vendors", async (req, res) => {
+
+  try {
+
+    const result = await sql.query(`
+
+      SELECT
+
+        VendorID,
+        BusinessName,
+        BusinessType,
+        Category,
+        ContactPerson,
+        Email,
+        PhoneNumber,
+        City,
+        State,
+        VendorStatus,
+        CreatedDt
+
+      FROM VendorMaster
+
+      WHERE
+        IsActive = 1
+        OR VendorStatus='Active'
+
+      ORDER BY CreatedDt DESC
+
+    `);
+
+    res.json({
+      success: true,
+      data: result.recordset
+    });
+
+  } catch (err) {
+
+    console.log(err);
+
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/active-vendor-stats", async (req, res) => {
+
+  try {
+
+    const result = await sql.query(`
+
+      SELECT
+      COUNT(*) TotalActiveVendors
+
+      FROM VendorMaster
+
+      WHERE
+      IsActive = 1
+      OR VendorStatus='Active'
+
+    `);
+
+    res.json({
+      success: true,
+      data: result.recordset[0]
+    });
+
+  } catch (err) {
+
+    res.status(500).json({
+      success:false
+    });
+
+  }
+
+});
+app.get("/api/admin/active-vendor-distribution", async (req, res) => {
+
+  try {
+
+    const result = await sql.query(`
+
+      SELECT
+      VendorStatus,
+      COUNT(*) Count
+
+      FROM VendorMaster
+
+      GROUP BY VendorStatus
+
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset
+    });
+
+  } catch(err){
+
+    res.status(500).json({
+      success:false
+    });
+
+  }
+
+});
+
+app.post("/api/admin/filter-active-vendors", async (req, res) => {
+
+  try {
+
+    const {
+      businessType,
+      category,
+      performance
+    } = req.body;
+
+    let query = `
+
+      SELECT *
+
+      FROM VendorMaster
+
+      WHERE
+      (IsActive = 1 OR VendorStatus='Active')
+
+    `;
+
+    if (businessType) {
+
+      query += `
+        AND BusinessType='${businessType}'
+      `;
+    }
+
+    if (category) {
+
+      query += `
+        AND Category='${category}'
+      `;
+    }
+
+    const result =
+      await sql.query(query);
+
+    res.json({
+      success:true,
+      data:result.recordset
+    });
+
+  } catch(err){
+
+    res.status(500).json({
+      success:false
+    });
+
+  }
+
+});
+
+//to get the vendor-overview status i.e the earnings and sale record
+app.get("/api/admin/vendor-summary/:vendorId", async (req, res) => {
+
+  try {
+
+    const vendorId = req.params.vendorId;
+
+    const result = await sql.query(`
+      SELECT
+        ISNULL(SUM(TotalPrice),0) AS TotalRevenue,
+        COUNT(DISTINCT OrderID) AS TotalOrders,
+        ISNULL(SUM(Quantity),0) AS TotalProductsSold,
+        CASE
+          WHEN COUNT(DISTINCT OrderID)=0
+          THEN 0
+          ELSE CAST(
+            SUM(TotalPrice) /
+            COUNT(DISTINCT OrderID)
+          AS DECIMAL(18,2))
+        END AS AverageOrderValue
+      FROM OrderDetails
+      WHERE VendorID = ${vendorId}
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset[0]
+    });
+
+  }
+
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-revenue-chart/:vendorId", async (req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+      SELECT
+      CAST(CreatedDt AS DATE) AS SalesDate,
+      SUM(TotalPrice) AS Revenue
+      FROM OrderDetails
+      WHERE VendorID=${vendorId}
+      GROUP BY CAST(CreatedDt AS DATE)
+      ORDER BY SalesDate
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset
+    });
+
+  }
+
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-orders-chart/:vendorId", async (req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+      SELECT
+      CAST(CreatedDt AS DATE) AS SalesDate,
+      COUNT(DISTINCT OrderID) AS TotalOrders
+      FROM OrderDetails
+      WHERE VendorID=${vendorId}
+      GROUP BY CAST(CreatedDt AS DATE)
+      ORDER BY SalesDate
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset
+    });
+
+  }
+
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-category-sales/:vendorId", async (req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+      SELECT
+      PC.CategoryName,
+      SUM(OD.TotalPrice) AS Revenue
+      FROM OrderDetails OD
+      INNER JOIN ProductMaster PM
+      ON PM.ProductID=OD.ProductID
+      INNER JOIN ProductCategory PC
+      ON PC.ProductCategoryID=PM.ProductCategoryID
+      WHERE OD.VendorID=${vendorId}
+      GROUP BY PC.CategoryName
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset
+    });
+
+  }
+
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-top-products/:vendorId", async (req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+      SELECT TOP 5
+      PM.ProductName,
+      SUM(OD.Quantity) AS OrdersCount,
+      SUM(OD.TotalPrice) AS Revenue
+      FROM OrderDetails OD
+      INNER JOIN ProductMaster PM
+      ON PM.ProductID=OD.ProductID
+      WHERE OD.VendorID=${vendorId}
+      GROUP BY PM.ProductName
+      ORDER BY Revenue DESC
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset
+    });
+
+  }
+
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
 });

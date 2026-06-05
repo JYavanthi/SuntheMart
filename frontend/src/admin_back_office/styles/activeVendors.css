@@ -1,0 +1,166 @@
+.activevendors-layout{
+display:flex;
+background:#f6f8fb;
+min-height:100vh;
+}
+
+.activevendors-main{
+flex:1;
+padding:20px;
+}
+
+.activevendors-page-header h2{
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 0px;
+    margin-top: 9px;
+}
+
+.activevendors-page-header p{
+color:#6b7280;
+}
+
+.activevendors-stats{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:15px;
+margin:20px 0;
+}
+
+.activevendors-stat-card{
+background:#fff;
+padding:20px;
+border-radius:12px;
+border:1px solid #ececec;
+}
+
+.activevendors-stat-card h4{
+font-size:13px;
+color:#6b7280;
+margin-bottom:10px;
+}
+
+.activevendors-content{
+display:grid;
+grid-template-columns:3fr 1fr;
+gap:20px;
+}
+
+.activevendors-table-section{
+background:#fff;
+padding:20px;
+border-radius:12px;
+border:1px solid #ececec;
+}
+
+.activevendors-toolbar{
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:20px;
+}
+
+.activevendors-tabs{
+display: flex;
+    gap: 8px;
+}
+
+.activevendors-tabs button{
+border: none;
+    background: none;
+    cursor: pointer;
+    padding: 5px;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.activevendors-tabs .active{
+color:#16a34a;
+border-bottom:2px solid #16a34a;
+}
+
+.activevendors-search input{
+padding:10px;
+width:250px;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+.activevendors-table-card table{
+width:100%;
+border-collapse:collapse;
+}
+
+.activevendors-table-card th{
+text-align:center;
+padding:14px;
+font-size:13px;
+border-bottom:1px solid #eee;
+}
+
+.activevendors-table-card td{
+padding:14px;
+border-bottom:1px solid #eee;
+font-size:14px;
+}
+
+.activevendors-status{
+background:#dcfce7;
+color:#15803d;
+padding:5px 12px;
+border-radius:20px;
+font-size:12px;
+font-weight:600;
+}
+
+.activevendors-right-panel{
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+
+.activevendors-card{
+background:#fff;
+padding:20px;
+border-radius:12px;
+border:1px solid #ececec;
+}
+
+.activevendors-circle{
+width:140px;
+height:140px;
+border:12px solid #16a34a;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+margin:20px auto;
+font-size:28px;
+font-weight:700;
+}
+
+.activevendors-circle span{
+display:block;
+font-size:12px;
+font-weight:500;
+}
+
+.activevendors-card select{
+width:100%;
+padding:10px;
+margin-bottom:10px;
+border:1px solid #ddd;
+border-radius:8px;
+}
+
+.activevendors-filter-btn,
+.activevendors-export-btn{
+width:100%;
+background:#16a34a;
+color:#fff;
+border:none;
+padding:12px;
+border-radius:8px;
+cursor:pointer;
+font-weight:600;
+}

@@ -105,34 +105,12 @@ function AdminChooseCategory() {
       console.error("Failed to fetch categories", error);
     }
   };
-//   const fetchCategories = async () => {
-//   try {
-//     const res = await fetch("http://localhost:4000/api/product-categories");
-//     const data = await res.json();
-
-//     const activeCategories = (data.data || []).filter(
-//       (item: Category) => Number(item.Status) === 1
-//     );
-
-//     setCategories(activeCategories);
-//   } catch (error) {
-//     console.error("Failed to fetch categories", error);
-//   }
-// };
 
   useEffect(() => {
     fetchCategories();
   }, []);
 
-  // 🔥 When category is selected
-  // const handleCategorySelect = (category: Category) => {
-  //   navigate("/addProduct", {
-  //     state: {
-  //       ProductCategoryID: category.ProductCategoryID,
-  //       CategoryName: category.CategoryName
-  //     }
-  //   });
-  // };
+
 
   const handleCategorySelect = (category: Category) => {
   navigate("/AddProduct", {

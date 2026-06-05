@@ -2,10 +2,12 @@
   "ExpandedNodes": [
     "",
     "\\frontend",
+    "\\frontend\\public",
     "\\frontend\\src",
     "\\frontend\\src\\admin_back_office",
     "\\frontend\\src\\admin_back_office\\styles",
     "\\frontend\\src\\styles"
   ],
+  "SelectedNode": "\\frontend\\public\\market_path_mid.png",
   "PreviewInSolutionExplorer": false
 }

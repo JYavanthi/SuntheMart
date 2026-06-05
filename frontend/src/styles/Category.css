@@ -1,0 +1,292 @@
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+.catgry-page{
+  padding:0px;
+  background:white;
+}
+
+
+.catgry-hero-section{
+  background:white;
+  border-radius:22px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  min-height:259px;
+}
+
+
+.catgry-hero-right{
+  flex:1;
+  height:100%;
+}
+
+.catgry-hero-right img{
+  width: 100%;
+    height: 259px;
+    object-fit: cover;
+    object-position: center 45%;
+}
+
+/* HEADING */
+
+.catgry-heading-section{
+  text-align:center;
+    margin: 33px 0 47px;
+}
+
+.catgry-heading-section h2{
+  font-size:26px;
+  color:#3d642d;
+  margin-bottom:0px;
+  letter-spacing: 1px;
+  
+}
+
+.catgry-heading-section p{
+  color:#666;
+  font-size:16px;
+  font-weight: 600;
+}
+
+/* GRID */
+
+.catgry-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+  gap:26px;
+  padding: 0px 30px;
+}
+
+.catgry-card{
+  background:white;
+  border-radius:18px;
+  overflow:hidden;
+  border:1px solid #e7e7e7;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.catgry-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 12px 24px rgba(0,0,0,0.08);
+}
+
+.catgry-image-wrapper{
+  width:100%;
+  height:180px;
+  overflow:hidden;
+}
+
+.catgry-image{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  transition:0.4s;
+}
+
+.catgry-card:hover .catgry-image{
+  transform:scale(1.08);
+}
+
+.catgry-content{
+  padding:10px;
+  text-align:center;
+}
+
+.catgry-icon{
+ width: 70px;
+    height: 70px;
+    background: #f1f8f3;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: -40px auto 15px;
+        margin-bottom: 2px;
+
+}
+.catgry-icon img{
+       width: 73px;
+    height: 73px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.catgry-name{
+  font-size:18px;
+  font-weight:700;
+  color:#1d2c13;
+  margin-bottom:2px;
+}
+
+.catgry-desc{
+  display:block;
+  color:#666;
+  margin-bottom:10px;
+  font-size: 15px;
+}
+
+.catgry-shop-btn{
+  border:none;
+  background:#2c7b1f;
+  color:white;
+  padding:10px 20px;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+  transition:0.3s;
+}
+
+.catgry-shop-btn:hover{
+  background:#1f5c15;
+}
+
+/* FEATURES */
+
+.catgry-features{
+ margin-top: 30px;
+    background: #eef6e7;
+    border-radius: 18px;
+    padding: 13px 99px;
+    display: flex;
+    justify-content: space-between;
+    /* gap: 100px; */
+    flex-wrap: wrap;
+}
+
+.catgry-feature-item{
+  display: flex;
+  gap: 10px;
+}
+.catgry-feature-item img{
+  width: 50px;
+  height: 50px;
+ } 
+ 
+ .catgry-feature-item h1{
+   font-size:16px;
+  font-weight:600;
+  color:#2c7b1f;
+  display: flex;
+  align-items: center;
+ }
+ /* WHY */
+
+.catgry-why-section{
+  margin-top:30px;
+}
+
+.catgry-why-section h2{
+  text-align:center;
+  font-size:28px;
+  color:#244019;
+  margin-bottom:2px;
+}
+
+.catgry-why-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:22px;
+}
+
+.catgry-why-card{
+  background:white;
+  border-radius:18px;
+  padding:28px;
+  text-align:center;
+  border:1px solid #ececec;
+  border: none;
+}
+.catgry-why-card img{
+  width: 60px;
+  height: 60px;
+}
+.catgry-why-card div{
+     font-size: 46px;
+    margin-bottom: 3px;
+}
+
+.catgry-why-card h3{
+  margin-bottom:3px;
+  color:#1d2c13;
+}
+
+.catgry-why-card p{
+  color:#666;
+  line-height:1.2;
+  font-size: 15px;
+}
+
+/* BOTTOM */
+
+.catgry-bottom-banner{
+  margin-top:40px;
+  background:#eef6e7;
+  border-radius:24px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+}
+
+
+.catgry-bottom-right{
+  flex:1;
+}
+
+.catgry-bottom-right img{
+  width:100%;
+  height:360px;
+  object-fit:cover;
+  object-position: center 20%;
+}
+
+/* MOBILE */
+
+@media(max-width:900px){
+
+  .catgry-hero-section,
+  .catgry-bottom-banner{
+    flex-direction:column;
+  }
+
+  .catgry-hero-left,
+  .catgry-bottom-left{
+    padding:35px;
+  }
+
+  .catgry-hero-left h1,
+  .catgry-bottom-left h2{
+    font-size:38px;
+  }
+}
+
+@media(max-width:600px){
+
+  .catgry-page{
+    padding:14px;
+  }
+
+  .catgry-grid,
+  .catgry-why-grid{
+    grid-template-columns:1fr;
+  }
+
+  .catgry-features{
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .catgry-heading-section h2,
+  .catgry-why-section h2{
+    font-size:30px;
+  }
+}
+
+

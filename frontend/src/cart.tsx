@@ -632,6 +632,7 @@ import rem_wish from "./assets/remove_wish.png";
 import { useConfirm } from "./context/ConfirmContext";
 import emptyCart from "./assets/cart_empty.jpg"
 import removeCart from "./assets/remove_cart.png"
+import bg from "./assets/cart-bg.jpeg"
 
 interface ProductAPI {
   ProductID: number;
@@ -667,9 +668,7 @@ export default function Cart() {
  const subTotal = total-autoDiscount-discountAmount;
  const finalTotal = subTotal + gst ;
 
-  /* ===============================
-     FETCH COUPONS
-     =============================== */
+
 
   useEffect(() => {
 
@@ -733,68 +732,6 @@ export default function Cart() {
 
   }, [coupons, total]);
 
-  /* ===============================
-     APPLY COUPON
-     =============================== */
-
-  // const applyCoupon = () => {
-
-  //   if (!couponInput) {
-  //     setCouponMessage("Please enter coupon code");
-  //     return;
-  //   }
-
-  //   const cp = coupons.find(
-  //     (c:any) =>
-  //       c.CouponCode &&
-  //       c.CouponCode.toLowerCase() === couponInput.toLowerCase()
-  //   );
-
-  //   if (!cp) {
-  //     setCouponMessage("Invalid coupon code");
-  //     setDiscountAmount(0);
-  //       localStorage.removeItem("couponDiscount"); 
-  //     return;
-  //   }
-
-  //   const minOrder = Number(cp.MinOrderValue || cp.MinOrderAmount || 0);
-  //   const discountValue = Number(cp.DiscountValue || 0);
-  //   const maxDiscount = Number(cp.MaxDiscount || 0);
-
-  //   if (total < minOrder) {
-
-  //     const remaining = minOrder - total;
-
-  //     setCouponMessage(
-  //       `Add products worth ₹${remaining} more to apply this coupon`
-  //     );
-
-  //     setDiscountAmount(0);
-  //      localStorage.removeItem("couponDiscount");
-  //     return;
-  //   }
-
-  //   let discount = 0;
-
-  //   if (cp.DiscountType === "Flat") {
-
-  //     discount = discountValue;
-
-  //   } else {
-
-  //     discount = (total * discountValue) / 100;
-
-  //     if (maxDiscount > 0) {
-  //       discount = Math.min(discount, maxDiscount);
-  //     }
-
-  //   }
-
-  //   setDiscountAmount(discount);
-  //   localStorage.setItem("couponDiscount", discount.toString())
-  //   setCouponMessage(`Coupon Applied! You saved ₹${discount}`);
-
-  // };
 
 const applyCoupon = () => {
 
@@ -927,395 +864,536 @@ const applyCoupon = () => {
   }, {})
 );
 
-  return (
-    <>
-      <Navbar />
+ return (
+  <>
+    <Navbar />
 
-      <div className="cart-page">
+    <div className="cart-page">
 
-        <div className="cart-back">
-  <button
-    className="back-btn"
-    onClick={() => navigate(-1)}
-  >
-    ←
-  </button>
+      {/* =========================
+          TOP BANNER
+      ========================= */}
 
+      <div className="cart-top-banner">
 
-        <div className="cart-steps">
-          
-          <span className="active">My Cart</span>
-          <span className="dots">-----------------</span>
-          <span>Address</span>
-          <span className="dots">-----------------</span>
-          <span>Payment</span>
-        </div>
-        </div>
-         
+        <img
+          src={bg}
+          alt="cart-banner"
+        />
+          <div className="cart-banner-overlay"></div>
+        <div className="cart-banner-left">
 
+          <h1>Your Cart</h1>
 
-        <div className="cart-content">
-
-          {/* LEFT SIDE */}
-
-          <div className="cart-left">
-        
-            {cartItems.length === 0 ? (
-              <>
-              <div className="empty-image"><img src={emp} alt="" /></div>
-              <p className="empty-cart">Your cart is empty</p>
-              <button className="shop-now" onClick={()=>navigate("/categoryProductPage")}>Shop now</button></>
-            ) : (
-
-              cartItems.map((item) => (
-
-                <div key={item.cartId} className="cart-item" >
-
-                  <img src={item.img} className="cart-img" alt="not found"onClick={() => navigate(`/product/${item.id}`)} />
-
-                  <div className="cart-details">
-
-                    <h4>{item.title}</h4>
-                    <p>{item.weight}</p>
-
-                    <div className="qty-controls">
-                      <button onClick={() => decreaseQty(item.cartId)}>-</button>
-                      <span>{item.qty}</span>
-                      <button onClick={() => increaseQty(item.cartId)}>+</button>
-
-                      <button
-                        className="cart-delete"
-                        onClick={() => removeFromCart(item.cartId)}
-          
-                      >
-                        <i className="fa-regular fa-trash-can"></i>
-                      </button>
-                    </div>
-
-                    <p className="wishlist">
-                      {isInWishlist(item.id) ? "Remove From Wishlist" : "Move To Wishlist"}
-                      <button
-                        className={`wishlogo-cart ${isInWishlist(item.id) ? "active" : ""}`}
-                        onClick={() =>{
-                          const alreadyInWishlist = isInWishlist(item.id);
-                           toggleWishlist(item);
-                           if (alreadyInWishlist) {
-                                 
-                                  showToast(
-                               rem_wish,
-                               "Wishlist Updated",
-                               "Item removed from wishlist",
-                               "wishlist-action"
-                             );
-                               } else {
-                                
-                                 showToast(
-                             add_wish,
-                             "Wishlist Updated",
-                             "Item added to wishlist successfully",
-                             "wishlist-action"
-                           );
-                               }
-                          }}
-                      >
-                        <i className="fa-regular fa-heart"></i>
-                      </button>
-                    </p>
-
-                  </div>
-
-                  <div className="cart-price">
-                    <h4>₹ {item.discount * item.qty}</h4>
-                    <p>MRP excl. all taxes</p>
-                  </div>
-
-                </div>
-
-              ))
-
-            )}
-
+          <div className="cart-breadcrumb">
+            Home <span>›</span> Cart
           </div>
 
-          {/* RIGHT SIDE */}
-          <div className="cart-right-content">
+        </div>
 
-          <div className="cart-right">
+        <div className="cart-banner-right">
+          <div className="cart-banner-card">
+            <div className="cart-banner-icon">
+              🛡️
+            </div>
+            <div>
 
-            <h3>Place Order</h3>
+              <h3>
+                Fresh. Safe. Delivered.
+              </h3>
 
-            <div className="summary">
+              <p>
+                Handpicked and carefully delivered
+                fresh to your doorstep.
+              </p>
 
-              <div className="row">
-                <span>Item Total (Excl. of all taxes)</span>
-                <span>₹ {total}</span>
-              </div>
-
-              {/* OPENING OFFER */}
-
-              {autoDiscount > 0 && (
-
-                <div className="row discount">
-                  <span style={{ fontWeight: 600 }}>{autoDiscountLabel}</span>
-                  <span>- ₹ {autoDiscount.toFixed(2)}</span>
-                </div>
-
-              )}
-              <div className="row">
-                <span>Shipping Charges</span>
-                <span className="free">Free</span>
-              </div>
-
-              {/* COUPON SECTION */}
-
-              <div className="coupon-section">
-
-                <h4>Coupons</h4>
-
-                <div className="coupon-input-row">
-
-                  {/* <input
-                    type="text"
-                    className="coupon-input"
-                    placeholder="Enter coupon code"
-                    value={couponInput}
-                    onChange={(e)=>setCouponInput(e.target.value)}
-                  /> */}
-                  <input
-  type="text"
-  className="coupon-input"
-  placeholder={couponMessage ? couponMessage : "Enter coupon code"}
-  value={couponInput}
-  onChange={(e) => {
-    setCouponInput(e.target.value);
-    setCouponMessage(""); 
-  }}
-   
-/>
-
-                  <button
-                    className="apply-btn"
-                    disabled={cartItems.length === 0}
-                    onClick={applyCoupon}
-                  >
-                    Apply
-                  </button>
-
-                </div>
-
-                {/* {couponMessage && couponInput && (
-                  <p className="coupon-message">{couponMessage}</p>
-                )} */}
-
-                {couponMessage && couponInput && (
-
-  <p
-    className="coupon-message"
-    style={{
-      fontSize: "15px",
-      color:
-        couponMessage.includes("Applied")
-          ? "green"
-          : "red"
-    }}
-  >
-    {couponMessage}
-  </p>
-
-)}
-
-              </div>
-
-              {/* COUPON DISCOUNT */}
-
-              {discountAmount > 0 && couponInput && (
-
-                <div className="row discount">
-                  <span>Coupon Discount</span>
-                  <span>- ₹ {discountAmount}</span>
-                </div>
-
-              )}
-              <hr />
-               <div className="row">
-                <span>Sub Total</span>
-                <span>₹ {subTotal}</span>
-              </div>
-
-              {/* <div className="row">
-                <span>GST</span>
-                <span>₹ {gst.toFixed(2)}</span>
-              </div> */}
-            <div className="row gst-row">
-  <span className="gst-title-wrap">
-    GST
-    <button
-      type="button"
-      className="gst-info-btn"
-      onClick={() => setShowGstDetails(!showGstDetails)}
-    >
-      i
-    </button>
-  </span>
-  <span>₹ {gst.toFixed(2)}</span>
-</div>
-
-{showGstDetails && (
-  <div className="gst-inline-box">
-    {gstBreakdown.map((item: any, index) => (
-      <div key={index} className="gst-inline-row">
-        <span>
-          {item.categoryName} ({item.gstPercent}%)
-        </span>
-        <span>₹ {item.amount.toFixed(2)}</span>
+            </div>
+          </div>
+        </div>
       </div>
-    ))}
-  </div>
-)}
 
-              <hr />
+      {/* =========================
+          MAIN SECTION
+      ========================= */}
 
-              <div className="row total">
-                <span>Total Amount</span>
-                <span>₹ {finalTotal.toFixed(2)}</span>
-              </div>
+      <div className="cart-main-wrapper">
+
+        {/* =========================
+            LEFT SECTION
+        ========================= */}
+
+        <div className="cart-left-section">
+
+          {/* SAVINGS */}
+
+          {cartItems.length > 0 && (
+
+            <div className="cart-saving-box">
+              🌿 Yay! You are saving ₹
+              {(autoDiscount + discountAmount).toFixed(0)}
+              {" "}on this order.
+            </div>
+
+          )}
+
+          {/* TABLE HEADER */}
+
+          {cartItems.length > 0 && (
+
+            <div className="cart-table-header">
+
+              <p>Product</p>
+              <p>Price</p>
+              <p>Quantity</p>
+              <p>Total</p>
 
             </div>
 
-            
-         <button
-  className="place-order-btn"
-  disabled={cartItems.length === 0}
-  onClick={() => {
-   
+          )}
 
-    navigate("/cart-address");
-  }}
->
-  PLACE ORDER
-</button>
-{/* <button
-  className="place-order-btn"
-  disabled={cartItems.length === 0}
-  onClick={() => {
-    localStorage.setItem("checkoutItems", JSON.stringify(cartItems));
-    navigate("/cart-address");
-  }}
->
-  PLACE ORDER
-</button> */}
+          {/* EMPTY CART */}
 
+          {cartItems.length === 0 ? (
 
-          </div>
+            <div className="cart-empty-box">
 
-          
-             {cartItems.length > 0 && (
-  <div className="empty-cart-container">
-    {/* <button
-      className="empty-cart-btn"
-      onClick={async () => {
-        const ok = window.confirm("Are you sure you want to empty the cart?");
-        if (!ok) return;
+              <img
+                src={emp}
+                alt="empty-cart"
+              />
 
-        await clearCart();
-        toast.success("Cart emptied successfully");
-      }}
-    >
-    <i className="fa-regular fa-trash-can"></i>      Empty Cart
-    </button>  
-   */}
-   <button
-    className="empty-cart-btn"
-    onClick={async () => {
+              <h2>
+                Your Cart is Empty
+              </h2>
 
-      const ok = await confirm({
-        title: "Are you sure you want to empty the cart?",
-        subText: "All items will be removed from your cart.",
-        confirmText: "Yes, Empty",
-        cancelText: "Cancel",
-        image: emptyCart, // 👈 use your sad cart image
-        variant: "empty_cart",
-      });
+              <p>
+                Looks like you haven’t added anything yet.
+              </p>
 
-      if (!ok) return;
+              <button
+                className="cart-shop-btn"
+                onClick={() =>
+                  navigate("/categoryProductPage")
+                }
+              >
+                Shop Now
+              </button>
 
-      await clearCart();
-      // toast.success("Cart emptied successfully");
-        showToast(
-        removeCart,
-        "Cart Updated",
-        "Cart emptied successfully",
-        "cart-emptied"
-      );
+            </div>
 
-    }}
-  >
-    <i className="fa-regular fa-trash-can"></i> Empty Cart
-  </button>
-    
+          ) : (
 
-   <button className="cart-add-more" onClick={()=>navigate("/categoryProductPage")}> + Add more items</button>
+            cartItems.map((item) => (
 
-  </div>
-)} 
-</div>
+              <div
+                className="cart-product-card"
+                key={item.cartId}
+              >
 
-     
+                {/* PRODUCT INFO */}
 
-        </div>
-
-        {/* RECOMMENDATIONS */}
-
-        {recommendedProducts.length > 0 && (
-
-          <div className="recommendations">
-
-            <h3>You May Also Like</h3>
-
-            <div className="products-carousel">
-
-              {recommendedProducts.map((item, index) => (
-
-                <div key={index} className="product-card">
+                <div className="cart-product-left">
 
                   <img
                     src={item.img}
                     alt={item.title}
-                    className="img-placeholder"
+                    className="cart-product-img"
+                    onClick={() =>
+                      navigate(`/product/${item.id}`)
+                    }
                   />
 
-                  <h4>{item.title}</h4>
-                  <h3 className="price">₹ {item.price}</h3>
+                  <div className="cart-product-info">
+
+                    <h3>
+                      {item.title}
+                    </h3>
+
+                    <p>
+                      {item.weight}
+                    </p>
+
+                    <span>
+                      Farm Fresh
+                    </span>
+
+                  </div>
+
+                </div>
+
+                {/* PRICE */}
+
+                <div className="cart-price-box">
+
+                  <h3>
+                    ₹ {item.discount}
+                  </h3>
+
+                  <p>
+                    ₹ {item.price}
+                  </p>
+
+                </div>
+
+                {/* QUANTITY */}
+
+                <div className="cart-qty-box">
 
                   <button
-                    className="cart-add-btn"
-                    onClick={() => {
-
-                      if (isInCart(item.id)) {
-
-                        navigate("/cart");
-
-                      } else {
-
-                        addToCart({
-                          id: item.id,
-                          title: item.title,
-                          price: item.price,
-                          qty: 1,
-                          img: item.img,
-                          weight: item.weight,
-                        });
-
-                      }
-
-                    }}
+                    onClick={() =>
+                      decreaseQty(item.cartId)
+                    }
                   >
-                    {isInCart(item.id) ? "✔ Go To Cart" : "Add To Cart"}
+                    −
+                  </button>
+
+                  {/* <span>
+                    {item.qty}
+                  </span> */}
+                  <span>
+  {
+    Number(
+      localStorage.getItem(`weight_${item.id}`)
+    ) || item.qty
+  }
+</span>
+
+                  <button
+                    onClick={() =>
+                      increaseQty(item.cartId)
+                    }
+                  >
+                    +
                   </button>
 
                 </div>
 
-              ))}
+                {/* TOTAL */}
+
+                <div className="cart-total-box">
+
+                  <h3>
+                    ₹ {item.discount * item.qty}
+                  </h3>
+
+                </div>
+
+                {/* REMOVE */}
+
+                <button
+                  className="cart-remove-btn"
+                  onClick={() =>
+                    removeFromCart(item.cartId)
+                  }
+                >
+                  ✕
+                </button>
+
+              </div>
+
+            ))
+
+          )}
+
+          {/* ACTION BUTTONS */}
+
+          {cartItems.length > 0 && (
+
+            <div className="cart-action-row">
+
+              <button
+                className="cart-outline-btn"
+                onClick={() =>
+                  navigate("/categoryProductPage")
+                }
+              >
+                ← Continue Shopping
+              </button>
+
+              <button
+                className="cart-outline-btn"
+                onClick={async () => {
+
+                  const ok = await confirm({
+
+                    title:
+                      "Are you sure you want to empty the cart?",
+
+                    subText:
+                      "All items will be removed from your cart.",
+
+                    confirmText:
+                      "Yes, Empty",
+
+                    cancelText:
+                      "Cancel",
+
+                    image:
+                      emptyCart,
+
+                    variant:
+                      "empty_cart",
+                  });
+
+                  if (!ok) return;
+
+                  await clearCart();
+
+                  showToast(
+                    removeCart,
+                    "Cart Updated",
+                    "Cart emptied successfully",
+                    "cart-emptied"
+                  );
+
+                }}
+              >
+                🗑 Clear Cart
+              </button>
+
+            </div>
+
+          )}
+
+          {/* =========================
+              FARM BANNER
+          ========================= */}
+
+          {cartItems.length > 0 && (
+
+            <div className="cart-farm-banner">
+
+              <div className="cart-farm-left">
+
+                <img
+                  src="https://img.freepik.com/free-photo/portrait-indian-farmer-holding-vegetables_23-2148760996.jpg"
+                  alt=""
+                />
+
+              </div>
+
+              <div className="cart-farm-center">
+
+                <h2>
+                  From Our Farms to Your Home
+                </h2>
+
+                <p>
+                  Supporting 5000+ farmers and their families.
+                </p>
+
+                <div className="cart-farm-features">
+
+                  <div>
+                    🌿 Direct from Farmers
+                  </div>
+
+                  <div>
+                    🥬 100% Natural
+                  </div>
+
+                  <div>
+                    🚜 Handpicked
+                  </div>
+
+                  <div>
+                    💚 Fair Price
+                  </div>
+
+                </div>
+
+              </div>
+
+              <div className="cart-farm-right">
+
+                <img
+                  src="https://pngimg.com/d/basket_PNG26.png"
+                  alt=""
+                />
+
+              </div>
+
+            </div>
+
+          )}
+
+        </div>
+
+        {/* =========================
+            RIGHT SUMMARY
+        ========================= */}
+
+        {cartItems.length > 0 && (
+
+          <div className="cart-summary-section">
+
+            <div className="cart-summary-card">
+
+              <h2>
+                Order Summary
+              </h2>
+
+              <div className="cart-summary-row">
+
+                <p>
+                  Subtotal ({cartItems.length} items)
+                </p>
+
+                <span>
+                  ₹ {total}
+                </span>
+
+              </div>
+
+              {/* AUTO DISCOUNT */}
+
+              {autoDiscount > 0 && (
+
+                <div className="cart-summary-row green">
+
+                  <p>
+                    {autoDiscountLabel}
+                  </p>
+
+                  <span>
+                    - ₹ {autoDiscount.toFixed(2)}
+                  </span>
+
+                </div>
+
+              )}
+
+              {/* COUPON DISCOUNT */}
+
+              {discountAmount > 0 && (
+
+                <div className="cart-summary-row green">
+
+                  <p>
+                    Coupon Discount
+                  </p>
+
+                  <span>
+                    - ₹ {discountAmount}
+                  </span>
+
+                </div>
+
+              )}
+
+              {/* DELIVERY */}
+
+              <div className="cart-summary-row">
+
+                <p>
+                  Delivery Charges
+                </p>
+
+                <span className="free">
+                  Free
+                </span>
+
+              </div>
+
+              {/* COUPON */}
+
+              <div className="cart-coupon-box">
+
+                <input
+                  type="text"
+                  placeholder="Enter coupon code"
+                  value={couponInput}
+                  onChange={(e) => {
+
+                    setCouponInput(
+                      e.target.value
+                    );
+
+                    setCouponMessage("");
+
+                  }}
+                />
+
+                <button
+                  onClick={applyCoupon}
+                >
+                  Apply
+                </button>
+
+              </div>
+
+              {couponMessage && (
+
+                <p
+                  className={`cart-coupon-msg ${
+                    couponMessage.includes("Applied")
+                      ? "success"
+                      : "error"
+                  }`}
+                >
+                  {couponMessage}
+                </p>
+
+              )}
+
+              {/* GST */}
+
+              <div className="cart-summary-row">
+
+                <p>
+                  GST
+                </p>
+
+                <span>
+                  ₹ {gst.toFixed(2)}
+                </span>
+
+              </div>
+
+              {/* TOTAL */}
+
+              <div className="cart-summary-total">
+
+                <h3>
+                  Total Amount
+                </h3>
+
+                <h2>
+                  ₹ {finalTotal.toFixed(2)}
+                </h2>
+
+              </div>
+
+              <button
+                className="cart-checkout-btn"
+                onClick={() =>
+                  navigate("/checkout")
+                }
+              >
+                Proceed to Checkout
+              </button>
+
+            </div>
+
+            {/* FEATURES */}
+
+            <div className="cart-feature-list">
+
+              <div>
+                🛡️ 100% Safe & Secure Payments
+              </div>
+
+              <div>
+                🌿 Freshness Guaranteed
+              </div>
+
+              <div>
+                🚚 Fast Delivery
+              </div>
+
+              <div>
+                🔄 Easy Returns
+              </div>
 
             </div>
 
@@ -1325,8 +1403,85 @@ const applyCoupon = () => {
 
       </div>
 
-      <Footer />
-   
-    </>
-  );
+      {/* =========================
+          RECOMMENDED PRODUCTS
+      ========================= */}
+
+      {recommendedProducts.length > 0 && (
+
+        <div className="cart-recommend-section">
+
+          <h2>
+            You May Also Like
+          </h2>
+
+          <div className="cart-recommend-grid">
+
+            {recommendedProducts.map((item, index) => (
+
+              <div key={index} className="cart-recommend-card" >
+                <div className="cart-recommend-img-cntr"> 
+                  <img
+                    src={item.img}
+                    alt=""
+                  />
+                </div>
+                <div>
+                  <h4>
+                  {item.title}
+                </h4>
+
+                <p>
+                  {item.weight}
+                </p>
+
+                <h3>
+                  ₹ {item.price}
+                </h3>
+
+                <button
+                  onClick={() => {
+
+                    if (isInCart(item.id)) {
+
+                      navigate("/cart");
+
+                    } else {
+
+                      addToCart({
+                        id: item.id,
+                        title: item.title,
+                        price: item.price,
+                        qty: 1,
+                        img: item.img,
+                        weight: item.weight,
+                      });
+
+                    }
+
+                  }}
+                >
+                  {isInCart(item.id)
+                    ? "✔ Go To Cart"
+                    : "Add To Cart"}
+                </button>
+                </div>
+
+                
+
+              </div>
+
+            ))}
+
+          </div>
+
+        </div>
+
+      )}
+
+    </div>
+
+    <Footer />
+  </>
+);
 }

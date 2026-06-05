@@ -1,0 +1,112 @@
+.hp-wrapper {
+  padding: 10px 60px;
+  background: white;
+}
+
+.hp-section {
+  margin-bottom: 10px;
+}
+
+.hp-head-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hp-head-row h2 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.hp-head-row span {
+  color: #2e7d32;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* horizontal scroll row */
+.hp-row {
+  display: flex;
+  gap: 18px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+      padding-top: 10px;
+}
+
+/* TILE CARD */
+.hp-tile {
+      min-width: 200px;
+    background: #fff;
+    border-radius: 6px;
+    display: flex;
+    padding: 7px 6px;
+    gap: 12px;
+    /* box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08); */
+    transition: 0.3s;
+    border: 1.5px solid #eee;
+}
+
+.hp-tile:hover {
+  transform: translateY(-4px);
+}
+
+.hp-tile-img {
+width: 100px;
+    height: 120px;
+    object-fit: contain;
+    cursor: pointer;
+}
+
+/* CONTENT */
+.hp-tile-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.hp-cat {
+  font-size: 13px;
+  color: #777;
+}
+
+.hp-name {
+font-size: 16px;
+    font-weight: 700;
+    margin: 0px;
+}
+
+.hp-desc {
+  font-size: 13px;
+  color: #666;
+  height: 32px;
+  overflow: hidden;
+}
+
+.hp-bottom {
+  /* display: flex; */
+  justify-content: space-between;
+  align-items: center;
+}
+
+.hp-price {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.hp-weight {
+  font-size: 13px;
+  color: #666;
+}
+
+.hp-add-btn {
+       background: #2e7d32;
+    color: #fff;
+    border: none;
+    padding: 5px 7px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 11px;
+    width: 77px;
+    font-weight: 600;
+}

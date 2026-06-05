@@ -1,180 +1,300 @@
 import React from "react";
+import "./styles/t&c.css";
+
+import bgImg from "./assets/terms-bg.jpeg";
 import Navbar from "./Navbar/navbar";
 import Footer from "./footer";
-import "./styles/t&c.css";
-import { useNavigate } from "react-router-dom";
-import { API_URLS } from "../src/API-Urls";
 
-const TermsConditions = () => {
-  
-    const handleDeleteAccount = async () => {
-      const confirmDelete = window.confirm(
-        "⚠️ Are you sure you want to delete your account?\nThis action can be recovered later."
-      );
-  
-      if (!confirmDelete) return;
-  
-      try {
-        const userId = localStorage.getItem("userId");
-  
-        if (!userId) {
-          alert("User not found");
-          return;
-        }
-  
-        const res = await fetch(
-          `${API_URLS.BASE_URL}users/${userId}/delete`,
-          { method: "PUT" }
-        );
-  
-        const data = await res.json();
-  
-        if (data.success) {
-          localStorage.clear();
-          alert("✅ Account deleted successfully");
-          navigate("/signup");
-        } else {
-          alert("❌ Failed to delete account");
-        }
-  
-      } catch (error) {
-        console.error("❌ Delete error:", error);
-        alert("Server error while deleting account");
-      }
-    };
-  
-  
-  
-  const navigate = useNavigate();
+// import shieldIcon from "../assets/shield.png";
+// import docIcon from "../assets/document.png";
+// import userIcon from "../assets/user.png";
+// import orderIcon from "../assets/card.png";
+// import deliveryIcon from "../assets/delivery.png";
+// import refundIcon from "../assets/refund.png";
+// import refreshIcon from "../assets/refresh.png";
+// import privacyIcon from "../assets/privacy.png";
+// import updateIcon from "../assets/update.png";
+// import mailIcon from "../assets/mail.png";
+
+function TermsConditions() {
   return (
     <>
-      <Navbar />
-      <div className="profile-page">
-        <div className="profile-content-add">
-          {/* SIDEBAR */}
-          <div className="prfl-sidebar">
-            <button onClick={() => navigate("/profile")}>MY ORDERS</button>
-            <button onClick={() => navigate("/address")}>SAVED ADDRESS</button>
-            <button className="active">TERMS & CONDITIONS</button>
-            <button onClick={() => navigate("/privacy-policy")}>PRIVACY POLICY</button>
-            <button
-            className="logout-btn"
-            onClick={() => {
-               const confirmLogout = window.confirm("Do you want to logout?");
-              if (confirmLogout) {
-                localStorage.clear();
-                navigate("/");
-                    }
-                  }}
-                >
-                  LOG OUT
-                </button>
-            <button className="delete-btn"  onClick={handleDeleteAccount}>DELETE ACCOUNT</button>
+    <Navbar/>
+    <div className="terms-page">
+
+      {/* HERO */}
+      <div
+        className="terms-hero"
+        style={{
+          backgroundImage: `linear-gradient(rgba(0,0,0,0.35), rgba(0,0,0,0.35)), url(${bgImg})`,
+        }}
+      >
+        <div className="terms-hero-content">
+
+          <h1>
+            Terms & Conditions
+            <span>🌿</span>
+          </h1>
+
+          <p>
+            Please read these terms and conditions carefully
+            before using our website or services.
+          </p>
+
+          <div className="terms-breadcrumb">
+            <span>🏠 Home</span>
+            <span>/</span>
+            <span>Terms & Conditions</span>
           </div>
 
-      <div className="terms-container">
-        <h1 className="terms-title">Terms & Conditions</h1>
-        <p className="terms-updated">
-          <strong>Last Updated:</strong> January 2026
-        </p>
-
-        <p>
-          Welcome to <strong>Brihati</strong>. By accessing or using this website,
-          you agree to comply with and be bound by the following Terms &
-          Conditions. Please read them carefully.
-        </p>
-
-        <section>
-          <h2>1. Eligibility</h2>
-          <p>
-            You must be at least 18 years old to use this website and place
-            orders.
-          </p>
-        </section>
-
-        <section>
-          <h2>2. Products</h2>
-          <p>
-            Brihati offers natural and healthy food products including snacks,
-            teas, rice, and related items. All products are subject to
-            availability and may be modified or discontinued without notice.
-          </p>
-        </section>
-
-        <section>
-          <h2>3. Orders & Payments</h2>
-          <p>
-            All orders placed through the website are subject to acceptance.
-            Prices are listed in INR and include applicable taxes unless stated
-            otherwise. Payments must be completed through the available payment
-            gateways.
-          </p>
-        </section>
-
-        <section>
-          <h2>4. Shipping & Delivery</h2>
-          <p>
-            Delivery timelines are estimates and may vary due to logistics or
-            external factors. Brihati is not responsible for delays beyond its
-            control.
-          </p>
-        </section>
-
-        <section>
-          <h2>5. Returns & Refunds</h2>
-          <p>
-            Damaged or defective products can be reported within 7 days of
-            delivery. Refunds or replacements will be processed after
-            verification. Food items once opened are not eligible for return.
-          </p>
-        </section>
-
-        <section>
-          <h2>6. Use of Website</h2>
-          <p>
-            You agree not to misuse the website, attempt unauthorized access, or
-            engage in activities that disrupt site functionality.
-          </p>
-        </section>
-
-        <section>
-          <h2>7. Intellectual Property</h2>
-          <p>
-            All content on this website including text, images, logos, and
-            designs belongs to Brihati and may not be copied or used without
-            written permission.
-          </p>
-        </section>
-
-        <section>
-          <h2>8. Limitation of Liability</h2>
-          <p>
-            Brihati shall not be liable for any indirect or consequential damages
-            arising from the use of this website or products.
-          </p>
-        </section>
-
-        <section>
-          <h2>9. Governing Law</h2>
-          <p>
-            These Terms shall be governed by and interpreted in accordance with
-            the laws of India.
-          </p>
-        </section>
-
-        <section className="contact-box">
-          <h2>10. Contact</h2>
-          <p>
-            Email: <span>support@brihati.in</span>
-          </p>
-        </section>
+        </div>
       </div>
-     </div>
-     </div> 
 
-      <Footer />
+      {/* CONTENT */}
+      <div className="terms-content-wrapper">
+
+        <div className="terms-card">
+
+          {/* INTRO */}
+          <div className="terms-intro">
+
+            <div className="terms-intro-icon">
+              {/* <img src={shieldIcon} alt="" /> */}
+            </div>
+
+            <div>
+              <p>
+                Welcome to SunThe Mart. By accessing or using our
+                website and services, you agree to comply with and
+                be bound by the following Terms & Conditions and
+                our Privacy Policy.
+              </p>
+            </div>
+
+          </div>
+
+          {/* GRID */}
+          <div className="terms-grid">
+
+            {/* LEFT */}
+            <div className="terms-column">
+
+              <div className="terms-item">
+                <div className="terms-icon">
+                  {/* <img src={docIcon} alt="" /> */}
+                </div>
+
+                <div className="terms-text">
+                  <h3>1. Acceptance of Terms</h3>
+
+                  <p>
+                    By using our website or placing an order,
+                    you agree to these Terms & Conditions and
+                    our Privacy Policy. If you do not agree,
+                    please do not use our services.
+                  </p>
+                </div>
+              </div>
+
+              <div className="terms-item">
+                <div className="terms-icon">
+                  {/* <img src={userIcon} alt="" /> */}
+                </div>
+
+                <div className="terms-text">
+                  <h3>2. Account Registration</h3>
+
+                  <p>
+                    To place an order, you may need to create
+                    an account. You agree to provide accurate,
+                    current, and complete information and keep
+                    your account details secure.
+                  </p>
+                </div>
+              </div>
+
+              <div className="terms-item">
+                <div className="terms-icon">
+                  {/* <img src={orderIcon} alt="" /> */}
+                </div>
+
+                <div className="terms-text">
+                  <h3>3. Orders & Payments</h3>
+
+                  <p>
+                    All orders are subject to availability and
+                    confirmation. Prices are displayed in INR
+                    and may change without prior notice.
+                  </p>
+                </div>
+              </div>
+
+              <div className="terms-item">
+                <div className="terms-icon">
+                  {/* <img src={deliveryIcon} alt="" /> */}
+                </div>
+
+                <div className="terms-text">
+                  <h3>4. Delivery</h3>
+
+                  <p>
+                    We strive to deliver your order within the
+                    delivery timelines mentioned. Delivery time
+                    may vary due to external factors.
+                  </p>
+                </div>
+              </div>
+
+              <div className="terms-item">
+                <div className="terms-icon">
+                  {/* <img src={refundIcon} alt="" /> */}
+                </div>
+
+                <div className="terms-text">
+                  <h3>5. Product Quality</h3>
+
+                  <p>
+                    We ensure fresh and quality products.
+                    Due to the nature of fresh produce,
+                    slight variations in size, color and
+                    freshness may occur.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            {/* RIGHT */}
+            <div className="terms-column">
+
+              <div className="terms-item">
+                <div className="terms-icon">
+                  {/* <img src={refreshIcon} alt="" /> */}
+                </div>
+
+                <div className="terms-text">
+                  <h3>6. Returns & Refunds</h3>
+
+                  <p>
+                    We offer hassle-free returns for eligible
+                    items as per our Returns & Refund Policy.
+                    Refunds will be processed to the original
+                    payment method.
+                  </p>
+                </div>
+              </div>
+
+              <div className="terms-item">
+                <div className="terms-icon">
+                  {/* <img src={shieldIcon} alt="" /> */}
+                </div>
+
+                <div className="terms-text">
+                  <h3>7. Limitation of Liability</h3>
+
+                  <p>
+                    SunThe Mart is not liable for indirect,
+                    incidental, or consequential damages arising
+                    from the use of our services or products.
+                  </p>
+                </div>
+              </div>
+
+              <div className="terms-item">
+                <div className="terms-icon">
+                  {/* <img src={privacyIcon} alt="" /> */}
+                </div>
+
+                <div className="terms-text">
+                  <h3>8. Privacy</h3>
+
+                  <p>
+                    Your privacy is important to us.
+                    Please review our Privacy Policy to
+                    understand how we collect, use, and
+                    protect your information.
+                  </p>
+                </div>
+              </div>
+
+              <div className="terms-item">
+                <div className="terms-icon">
+                  {/* <img src={updateIcon} alt="" /> */}
+                </div>
+
+                <div className="terms-text">
+                  <h3>9. Changes to Terms</h3>
+
+                  <p>
+                    We may update these terms from time
+                    to time. Changes will be effective
+                    upon posting on this page.
+                  </p>
+                </div>
+              </div>
+
+              <div className="terms-item">
+                <div className="terms-icon">
+                  {/* <img src={mailIcon} alt="" /> */}
+                </div>
+
+                <div className="terms-text">
+                  <h3>10. Contact Us</h3>
+
+                  <p>
+                    If you have any questions about these
+                    Terms & Conditions, please contact us
+                    at support@sunthemart.com
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* FOOT */}
+          <div className="terms-footer">
+
+            <div className="terms-updated">
+              📅 Last Updated: May 20, 2024
+            </div>
+
+            <div className="terms-leaf">
+              🌿
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      {/* BOTTOM STRIP */}
+      <div className="terms-bottom-strip">
+
+        <div className="terms-bottom-item">
+          🌿 Farm Fresh Produce
+        </div>
+
+        <div className="terms-bottom-item">
+          🛡️ Safe & Chemical Free
+        </div>
+
+        <div className="terms-bottom-item">
+          🚚 Fast & Reliable Delivery
+        </div>
+
+        <div className="terms-bottom-item">
+          💳 Easy Returns
+        </div>
+
+      </div>
+
+    </div>
+    <Footer/>
     </>
   );
-};
+}
 
 export default TermsConditions;

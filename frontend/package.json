@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@photo-sphere-viewer/core": "^5.14.1",
+    "axios": "^1.15.2",
     "chart.js": "^4.5.1",
     "react": "^19.2.0",
     "react-chartjs-2": "^5.3.1",

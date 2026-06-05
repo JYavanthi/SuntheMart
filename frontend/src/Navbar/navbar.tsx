@@ -6,8 +6,9 @@ import { useCart } from "../context/CartContext";
 import { toast } from "react-hot-toast";
 import { products, categories } from "../data_search/search_data";
 import { useConfirm } from "../context/ConfirmContext";
-import logo from "../assets/brihati_logo_transparent.png";
-import logout from "../assets/log_out.png"
+import logo from "../assets/santhe_mart_logo.jpeg";
+import logout from "../assets/log_out.png";
+import logotext from"../assets/San_mrt_logo-text.jpeg";
 
 function Navbar() { 
   const [menuOpen, setMenuOpen] = useState(false);
@@ -132,19 +133,21 @@ const handleSearch = () => {
         {/* LOGO */}
         <div className="left-section" onClick={() => handleNavClick("home")}>
           <div className="logo-circl"><img src={logo} alt="" /></div>
-          {/* <div className="logo-text">
-            <h2>BRIHATI</h2>
-            <p>FEEDING THE FUTURE</p>
-          </div> */}
+          <div className="logo-text">
+            <img src={logotext} alt=""  />
+          </div>
         </div>
 
         {/* NAV LINKS */}
         <ul className={`nav-links ${menuOpen ? "active" : ""}`}>
           <li onClick={() => handleNavClick("home")}>HOME</li>
-          <li onClick={() => navigate("/categoryProductPage")}>PRODUCTS</li>
-          <li onClick={() => handleNavClick("about")}>ABOUT</li>
-          <li onClick={() => handleNavClick("mission")}>MISSION</li>
-          <li onClick={() => handleNavClick("contact")}>CONTACT</li>
+          <li onClick={() => navigate("/categoryProductPage")}>SHOP</li>
+          <li onClick={() => navigate("/categories")}>CATEGORIES</li>
+          <li onClick={() => navigate("/aboutuspage")}>ABOUT</li>
+          {/* <li onClick={() => handleNavClick("mission")}>MISSION</li> */}
+          <li onClick={() => navigate("/contact")}>CONTACT</li>
+          <li onClick={() => navigate("/howitworkspage")}>HOW IT WORKS</li>
+           <li onClick={() => navigate("/faqs")}>FAQs</li>
         </ul>
 
          <div className="nav-actions">

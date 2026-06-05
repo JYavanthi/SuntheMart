@@ -1,0 +1,69 @@
+.hero-cat-container {
+  padding: 15px 58px;
+  background: white;
+}
+
+.hero-cat-title-div{
+    display: flex;
+    justify-content: space-between;
+        
+}
+.hero-cat-title-div button{
+    background-color: transparent;
+    padding: 0px;
+    font-size: 14px;
+    color: rgb(10, 67, 10);
+    font-weight: 600;
+}
+
+.hero-cat-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.hero-cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 27px;
+}
+
+.hero-cat-card {
+    width: 100px;
+  background: #ffffff;
+  border-radius: 14px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.3s ease;
+  text-align: center;
+}
+
+.hero-cat-card:hover {
+  transform: translateY(-6px);
+}
+
+.hero-cat-image-wrapper {
+  height: 100px;
+  width: 100%;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-cat-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.hero-cat-placeholder {
+  color: #888;
+}
+
+.hero-cat-name {
+     padding: 3px;
+    font-weight: 600;
+    margin: 7px;
+}
