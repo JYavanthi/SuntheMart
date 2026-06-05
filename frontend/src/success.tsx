@@ -1034,6 +1034,18 @@ const Success = () => {
               </span>
 
             </div>
+                          <div className="success-summary-row">
+
+                <p>
+                  GST
+                </p>
+
+                <span>
+                  ₹ {order.gst.toFixed(2)}
+                </span>
+
+              </div>
+
 
             <hr />
 

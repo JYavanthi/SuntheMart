@@ -241,6 +241,7 @@
 
 // export default VendorDetails;
 
+
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -276,8 +277,8 @@ const VendorDetails = () => {
     fetch(
       `http://localhost:4000/api/admin/vendor-details/${VendorID}`
     )
-      .then((res) => res.json())
-      .then((data) => {
+      .then(res => res.json())
+      .then(data => {
 
         if (data.success) {
           setVendor(data.data);
@@ -294,82 +295,80 @@ const VendorDetails = () => {
     return <div>Loading...</div>;
   }
 
+  if (!vendor) {
+    return <div>Vendor Not Found</div>;
+  }
+
   return (
 
-    <div className="vendor-layout">
+    <div className="actve-vndr-dtl-layout">
 
       <Sidebar />
 
-      <div className="vendor-main">
+      <div className="actve-vndr-dtl-main">
 
         <Header />
 
-        <div className="vendor-page">
+        <div className="actve-vndr-dtl-page">
 
-          <div className="vendor-breadcrumb">
+          <div className="actve-vndr-dtl-breadcrumb">
             Active Vendors &gt; Vendor Details &gt; Vendor Insights
           </div>
 
-          <h2 className="vendor-page-title">
+          <h1 className="actve-vndr-dtl-title">
             Active Vendor Details
-          </h2>
+          </h1>
 
-          <div className="vendor-header-card">
+          <div className="actve-vndr-dtl-header-card">
 
-            <div className="vendor-header-left">
+            <div className="actve-vndr-dtl-header-left">
 
-              <div className="vendor-logo">
+              <div className="actve-vndr-dtl-logo">
                 🏪
               </div>
 
               <div>
 
                 <h2>
-                  {vendor?.BusinessName}
+                  {vendor.BusinessName}
                 </h2>
 
-                <span className="vendor-status">
-                  {vendor?.VendorStatus}
+                <span className="actve-vndr-dtl-status">
+                  {vendor.VendorStatus}
                 </span>
 
+                <p>📧 {vendor.Email}</p>
+                <p>📞 {vendor.PhoneNumber}</p>
                 <p>
-                  📧 {vendor?.Email}
-                </p>
-
-                <p>
-                  📞 {vendor?.PhoneNumber}
-                </p>
-
-                <p>
-                  📍 {vendor?.City}, {vendor?.State}
+                  📍 {vendor.City}, {vendor.State}
                 </p>
 
               </div>
 
             </div>
 
-            <div className="vendor-header-right">
+            <div className="actve-vndr-dtl-header-right">
 
               <div>
                 <label>Vendor ID</label>
-                <span>{vendor?.VendorID}</span>
+                <span>{vendor.VendorID}</span>
               </div>
 
               <div>
                 <label>Business Type</label>
-                <span>{vendor?.BusinessType}</span>
+                <span>{vendor.BusinessType}</span>
               </div>
 
               <div>
                 <label>Business Category</label>
-                <span>{vendor?.Category}</span>
+                <span>{vendor.Category}</span>
               </div>
 
             </div>
 
           </div>
 
-          <div className="vendor-tabs">
+          <div className="actve-vndr-dtl-tabs">
 
             <button
               className={
@@ -413,21 +412,15 @@ const VendorDetails = () => {
           </div>
 
           {activeTab === "overview" && (
-            <VendorOverview
-              VendorID={VendorID}
-            />
+            <VendorOverview VendorID={VendorID} />
           )}
 
           {activeTab === "products" && (
-            <ProductPerformance
-              VendorID={VendorID}
-            />
+            <ProductPerformance VendorID={VendorID} />
           )}
 
           {activeTab === "wallets" && (
-            <WalletsAndPayouts
-              VendorID={VendorID}
-            />
+            <WalletsAndPayouts VendorID={VendorID} />
           )}
 
         </div>

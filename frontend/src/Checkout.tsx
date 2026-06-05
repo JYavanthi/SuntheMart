@@ -780,9 +780,21 @@ const Checkout = () => {
                   Delivery Charges
                 </span>
 
-                <span>₹40</span>
+                <span>FREE</span>
 
               </div>
+                            <div className="checkout-summary-row">
+
+                <p>
+                  GST
+                </p>
+
+                <span>
+                  ₹ {gst.toFixed(2)}
+                </span>
+
+              </div>
+
 
               <hr className="checkout-summary-divider" />
 

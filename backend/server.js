@@ -7147,3 +7147,241 @@ app.get("/api/admin/vendor-top-products/:vendorId", async (req,res)=>{
   }
 
 });
+
+app.get("/api/admin/vendor-product-summary/:vendorId", async (req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+
+      SELECT
+
+      COUNT(DISTINCT OD.ProductID) AS TotalProducts,
+
+      ISNULL(SUM(OD.TotalPrice),0) AS TotalRevenue,
+
+      ISNULL(SUM(OD.Quantity),0) AS TotalUnitsSold
+
+      FROM OrderDetails OD
+
+      WHERE OD.VendorID=${vendorId}
+
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset[0]
+    });
+
+  }
+
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-product-highlights/:vendorId", async (req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const topPerformer=await sql.query(`
+
+      SELECT TOP 1
+
+      PM.ProductName,
+      SUM(OD.TotalPrice) Revenue
+
+      FROM OrderDetails OD
+
+      INNER JOIN ProductMaster PM
+      ON PM.ProductID=OD.ProductID
+
+      WHERE OD.VendorID=${vendorId}
+
+      GROUP BY PM.ProductName
+
+      ORDER BY Revenue DESC
+
+    `);
+
+    const highestSelling=await sql.query(`
+
+      SELECT TOP 1
+
+      PM.ProductName,
+      SUM(OD.Quantity) Qty
+
+      FROM OrderDetails OD
+
+      INNER JOIN ProductMaster PM
+      ON PM.ProductID=OD.ProductID
+
+      WHERE OD.VendorID=${vendorId}
+
+      GROUP BY PM.ProductName
+
+      ORDER BY Qty DESC
+
+    `);
+
+    res.json({
+
+      success:true,
+
+      data:{
+
+        TopPerformer:
+          topPerformer.recordset[0]?.ProductName,
+
+        HighestSelling:
+          highestSelling.recordset[0]?.ProductName,
+
+        NeedsAttention:
+          "No Data"
+
+      }
+
+    });
+
+  }
+
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-product-performance/:vendorId", async (req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+
+      SELECT
+
+      PM.ProductName,
+
+      C.CategoryName,
+
+      PM.ProductID,
+
+      SUM(OD.Quantity) UnitsSold,
+
+      SUM(OD.TotalPrice) Revenue
+
+      FROM OrderDetails OD
+
+      INNER JOIN ProductMaster PM
+      ON PM.ProductID=OD.ProductID
+
+      LEFT JOIN CategoryMaster C
+      ON C.CategoryID=PM.CategoryID
+
+      WHERE OD.VendorID=${vendorId}
+
+      GROUP BY
+      PM.ProductName,
+      PM.ProductID,
+      C.CategoryName
+
+      ORDER BY Revenue DESC
+
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset
+    });
+
+  }
+
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-profitable-products/:vendorId", async (req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+
+      SELECT TOP 5
+
+      PM.ProductName,
+
+      SUM(OD.TotalPrice) Revenue
+
+      FROM OrderDetails OD
+
+      INNER JOIN ProductMaster PM
+      ON PM.ProductID=OD.ProductID
+
+      WHERE OD.VendorID=${vendorId}
+
+      GROUP BY PM.ProductName
+
+      ORDER BY Revenue DESC
+
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset
+    });
+
+  }
+
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-loss-products/:vendorId", async (req,res)=>{
+
+  res.json({
+
+    success:true,
+
+    data:[
+
+      {
+        ProductName:"No loss data available"
+      }
+
+    ]
+
+  });
+
+});
