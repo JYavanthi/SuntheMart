@@ -241,7 +241,7 @@
 
 // export default VendorDetails;
 
-
+import { API_URLS } from "../../API-Urls";
 import React, { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 
@@ -275,7 +275,7 @@ const VendorDetails = () => {
     if (!VendorID) return;
 
     fetch(
-      `http://localhost:4000/api/admin/vendor-details/${VendorID}`
+       `${API_URLS.BASE_URL}admin/vendor-details/${VendorID}`
     )
       .then(res => res.json())
       .then(data => {

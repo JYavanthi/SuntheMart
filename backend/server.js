@@ -29,7 +29,9 @@ const PORT = process.env.PORT || 4000;
 //   driver: "msnodesqlv8",
 // };
 
+
 const connectionString =
+  // "Driver={ODBC Driver 17 for SQL Server};Server=198.38.91.204;Database=SantheMart;Uid=sa;Pwd=Super@71;TrustServerCertificate=Yes;";
   "Driver={ODBC Driver 17 for SQL Server};Server=DESKTOP-SVHEEK2\\SQLEXPRESS;Database=SantheMart;Trusted_Connection=Yes;TrustServerCertificate=Yes;";
 
 sql.connect({ connectionString })
@@ -44,7 +46,7 @@ sql.connect({ connectionString })
   user: "sa",                 // 👈 your SQL username
   password: "YOUR_PASSWORD",  // 👈 your SQL password
   server: "localhost",        // 👈 or DESKTOP-XXXX
-  database: "Brihati",
+  database: "Santhemart",
   options: {
     encrypt: false,           // 🔥 IMPORTANT for local SQL Server
     trustServerCertificate: true
@@ -7291,8 +7293,8 @@ app.get("/api/admin/vendor-product-performance/:vendorId", async (req,res)=>{
       INNER JOIN ProductMaster PM
       ON PM.ProductID=OD.ProductID
 
-      LEFT JOIN CategoryMaster C
-      ON C.CategoryID=PM.CategoryID
+      LEFT JOIN ProductCategory C
+      ON C.ProductCategoryID=PM.ProductCategoryID
 
       WHERE OD.VendorID=${vendorId}
 
@@ -7383,5 +7385,365 @@ app.get("/api/admin/vendor-loss-products/:vendorId", async (req,res)=>{
     ]
 
   });
+
+});
+
+//wallets 
+
+
+app.get("/api/admin/vendor-wallet-summary/:vendorId", async(req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+
+      SELECT
+
+      ISNULL(R.TotalRevenue,0) TotalRevenue,
+
+      ISNULL(R.TotalRevenue * 0.40,0) TotalCommission,
+
+      ISNULL(R.TotalRevenue * 0.60,0) TotalNetEarnings,
+
+      ISNULL(P.TotalPaidOut,0) TotalPaidOut,
+
+      (
+        ISNULL(R.TotalRevenue * 0.60,0)
+        -
+        ISNULL(P.TotalPaidOut,0)
+      ) AvailableBalance,
+
+      (
+        ISNULL(R.TotalRevenue * 0.60,0)
+        -
+        ISNULL(P.TotalPaidOut,0)
+      ) PendingSettlement,
+
+      ISNULL(R.ThisMonthRevenue,0)
+      AS ThisMonthEarnings
+
+      FROM
+
+      (
+
+        SELECT
+
+        SUM(TotalPrice) TotalRevenue,
+
+        SUM(
+          CASE
+            WHEN MONTH(CreatedDt)=MONTH(GETDATE())
+            AND YEAR(CreatedDt)=YEAR(GETDATE())
+            THEN TotalPrice
+            ELSE 0
+          END
+        ) ThisMonthRevenue
+
+        FROM OrderDetails
+
+        WHERE VendorID=${vendorId}
+
+      ) R
+
+      CROSS JOIN
+
+      (
+
+        SELECT
+
+        ISNULL(SUM(NetAmount),0)
+        AS TotalPaidOut
+
+        FROM VendorPayouts
+
+        WHERE VendorID=${vendorId}
+        AND PayoutStatus='Completed'
+
+      ) P
+
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset[0]
+    });
+
+  }
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-wallet-overview/:vendorId", async(req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+
+      SELECT TOP 1
+
+      NetAmount LastSettlement,
+      PayoutDate LastSettlementDate
+
+      FROM VendorPayouts
+
+      WHERE VendorID=${vendorId}
+      AND PayoutStatus='Completed'
+
+      ORDER BY PayoutDate DESC
+
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset[0] || {
+        LastSettlement:0,
+        LastSettlementDate:null
+      }
+    });
+
+  }
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-payout-history/:vendorId", async(req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+
+      SELECT TOP 10
+
+      PayoutID,
+      PayoutDate,
+      NetAmount,
+      PayoutStatus
+      
+
+      FROM VendorPayouts
+
+      WHERE VendorID=${vendorId}
+
+      ORDER BY PayoutDate DESC
+
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset
+    });
+
+  }
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/admin/vendor-deductions/:vendorId", async(req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    const result=await sql.query(`
+
+      SELECT
+
+      ISNULL(SUM(CommissionAmount),0)
+      AS TotalCommission,
+
+      ISNULL(SUM(CommissionAmount),0)
+      AS TotalDeductions
+
+      FROM VendorPayouts
+
+      WHERE VendorID=${vendorId}
+
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset[0]
+    });
+
+  }
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.post("/api/admin/release-vendor-payment/:vendorId", async (req, res) => {
+  try {
+
+    const vendorId = req.params.vendorId;
+
+    // Get vendor wallet balance
+    const walletData = await sql.query(`
+
+      SELECT
+        ISNULL(SUM(TotalPrice),0) AS WalletBalance
+      FROM OrderDetails
+      WHERE VendorID = ${vendorId}
+
+    `);
+
+    const grossAmount =
+      Number(walletData.recordset[0].WalletBalance || 0);
+
+    if (grossAmount <= 0) {
+
+      return res.json({
+        success: false,
+        message: "No balance available for settlement"
+      });
+
+    }
+
+    const commissionPercentage = 40;
+
+    const commissionAmount =
+      grossAmount * (commissionPercentage / 100);
+
+    const netAmount =
+      grossAmount - commissionAmount;
+
+    await sql.query(`
+
+      INSERT INTO VendorPayouts
+      (
+        VendorID,
+        GrossAmount,
+        CommissionPercentage,
+        CommissionAmount,
+        NetAmount,
+        PayoutStatus,
+        PayoutDate,
+        CreatedDt
+      )
+      VALUES
+      (
+        ${vendorId},
+        ${grossAmount},
+        ${commissionPercentage},
+        ${commissionAmount},
+        ${netAmount},
+        'Completed',
+        GETDATE(),
+        GETDATE()
+      )
+
+    `);
+
+    res.json({
+      success: true,
+      message: "Payment Released Successfully"
+    });
+
+  }
+  catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+});
+app.post("/api/admin/hold-settlement/:vendorId", async(req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    await sql.query(`
+
+      UPDATE VendorPayouts
+
+      SET PayoutStatus='Hold'
+
+      WHERE VendorID=${vendorId}
+      AND PayoutStatus='Pending'
+
+    `);
+
+    res.json({
+      success:true,
+      message:"Settlement Held"
+    });
+
+  }
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.post("/api/admin/freeze-wallet/:vendorId", async(req,res)=>{
+
+  try{
+
+    const vendorId=req.params.vendorId;
+
+    await sql.query(`
+
+      UPDATE VendorMaster
+
+      SET WalletFrozen=1
+
+      WHERE VendorID=${vendorId}
+
+    `);
+
+    res.json({
+      success:true,
+      message:"Wallet Frozen"
+    });
+
+  }
+  catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
 
 });

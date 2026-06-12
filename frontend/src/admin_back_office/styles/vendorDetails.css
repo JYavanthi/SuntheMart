@@ -208,7 +208,7 @@
 }
 
 .actve-vndr-dtl-chart-wrap canvas{
-  max-height:240px !important;
+  height:240px !important;
 }
 
 /* =========================
@@ -229,7 +229,7 @@
 }
 
 .actve-vndr-dtl-table th{
-  padding:14px;
+  padding:11px;
   text-align:center;
   font-size:13px;
   color:#64748b;
@@ -237,7 +237,7 @@
 }
 
 .actve-vndr-dtl-table td{
-  padding:14px;
+  padding:11px;
   border-bottom:1px solid #e2e8f0;
   color:#334155;
 }
@@ -446,26 +446,29 @@
 }
 
 .actve-vndr-dtl-wallet-box{
-  background:#ffffff;
-  border:1px solid #e5e7eb;
-  border-radius:12px;
-  padding:18px;
-  min-height:240px;
-  box-shadow:0 1px 3px rgba(0,0,0,.05);
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 10px 18px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
 }
 
 .actve-vndr-dtl-wallet-box h3{
   font-size:15px;
   font-weight:600;
   color:#111827;
-  margin-bottom:18px;
+  margin-bottom:10px;
+      text-align: center;
 }
 
 .wallet-info-row{
   display:flex;
   justify-content:space-between;
-  margin:12px 0;
+  margin:6px 0;
   font-size:13px;
+}
+.wallet-info-row span{
+  font-size: 13px;
 }
 
 .wallet-total-green{
@@ -518,12 +521,13 @@
 }
 
 .wallet-dummy-chart{
-  height:280px;
-  border-radius:10px;
-  background:#f5f7fb;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+    height: 335px;
+    border-radius: 10px;
+    background: #f5f7fb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 40px;
 }
 
 .actve-vndr-dtl-wallet-side{
@@ -535,7 +539,7 @@
 .wallet-btn{
   width:100%;
   margin-bottom:10px;
-  padding:10px;
+  padding:6px 10px;
   border-radius:8px;
   border:1px solid #ddd;
   background:#fff;
@@ -567,6 +571,13 @@
   background:#fff;
   border:1px solid #e5e7eb;
   border-radius:12px;
-  padding:18px;
+  padding:10px 10px;
   box-shadow:0 1px 3px rgba(0,0,0,.05);
+}
+.actve-vndr-dtl-wallet-chart h3,
+.actve-vndr-dtl-wallet-payouts h3{
+  text-align: center;
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 5px ;
 }

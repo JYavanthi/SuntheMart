@@ -1,6 +1,162 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { API_URLS } from "../../API-Urls";
 
-const WalletsAndPayouts = () => {
+interface Props {
+  VendorID:number;
+}
+
+const WalletsAndPayouts = ({
+  VendorID
+}:Props) => {
+
+  const [walletSummary,setWalletSummary] =
+    useState<any>({});
+
+  const [walletOverview,setWalletOverview] =
+    useState<any>({});
+
+  const [deductions,setDeductions] =
+    useState<any>({});
+
+  const [payoutHistory,setPayoutHistory] =
+    useState<any[]>([]);
+
+  useEffect(()=>{
+
+    if(!VendorID) return;
+
+    loadWalletData();
+
+  },[VendorID]);
+
+  const loadWalletData=async()=>{
+
+    try{
+
+      const[
+        summaryRes,
+        overviewRes,
+        deductionRes,
+        payoutRes
+      ]=await Promise.all([
+
+        fetch(
+          `${API_URLS.BASE_URL}admin/vendor-wallet-summary/${VendorID}`
+        ),
+
+        fetch(
+          `${API_URLS.BASE_URL}admin/vendor-wallet-overview/${VendorID}`
+        ),
+
+        fetch(
+          `${API_URLS.BASE_URL}admin/vendor-deductions/${VendorID}`
+        ),
+
+        fetch(
+          `${API_URLS.BASE_URL}admin/vendor-payout-history/${VendorID}`
+        )
+
+      ]);
+
+      const summaryData=
+        await summaryRes.json();
+
+      const overviewData=
+        await overviewRes.json();
+
+      const deductionData=
+        await deductionRes.json();
+
+      const payoutData=
+        await payoutRes.json();
+
+      if(summaryData.success)
+        setWalletSummary(summaryData.data);
+
+      if(overviewData.success)
+        setWalletOverview(overviewData.data);
+
+      if(deductionData.success)
+        setDeductions(deductionData.data);
+
+      if(payoutData.success)
+        setPayoutHistory(payoutData.data);
+
+    }
+    catch(error){
+
+      console.log(error);
+
+    }
+
+  };
+
+  const releasePayment = async () => {
+
+  try {
+
+   const response = await fetch(
+ `${API_URLS.BASE_URL}admin/release-vendor-payment/${VendorID}`,
+ {
+   method:"POST"
+ }
+);
+
+const data = await response.json();
+
+alert(data.message);
+
+loadWalletData();
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+};
+
+const holdSettlement = async () => {
+
+  try {
+
+    await fetch(
+      `${API_URLS.BASE_URL}admin/hold-settlement/${VendorID}`,
+      {
+        method: "POST"
+      }
+    );
+
+    loadWalletData();
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+};
+
+const freezeWallet = async () => {
+
+  try {
+
+    await fetch(
+      `${API_URLS.BASE_URL}admin/freeze-wallet/${VendorID}`,
+      {
+        method: "POST"
+      }
+    );
+
+    alert("Wallet Frozen");
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+};
 
   return (
 
@@ -13,25 +169,33 @@ const WalletsAndPayouts = () => {
         <div className="actve-vndr-dtl-wallet-card">
           <span>💵</span>
           <h4>Available Balance</h4>
-          <h2>₹2,45,600</h2>
+        <h2>
+  ₹{Number(walletSummary.AvailableBalance || 0).toLocaleString()}
+</h2>
         </div>
 
         <div className="actve-vndr-dtl-wallet-card">
           <span>🪙</span>
           <h4>Pending Settlement</h4>
-          <h2>₹38,250</h2>
+       <h2>
+  ₹{Number(walletSummary.PendingSettlement || 0).toLocaleString()}
+</h2>
         </div>
 
         <div className="actve-vndr-dtl-wallet-card">
           <span>🏦</span>
           <h4>Total Paid Out</h4>
-          <h2>₹12,75,300</h2>
+          <h2>
+  ₹{Number(walletSummary.TotalPaidOut || 0).toLocaleString()}
+</h2>
         </div>
 
         <div className="actve-vndr-dtl-wallet-card">
           <span>📈</span>
           <h4>This Month Earnings</h4>
-          <h2>₹1,84,500</h2>
+         <h2>
+  ₹{Number(walletSummary.ThisMonthEarnings || 0).toLocaleString()}
+</h2>
         </div>
 
       </div>
@@ -46,17 +210,28 @@ const WalletsAndPayouts = () => {
 
           <div className="wallet-info-row">
             <span>Current Wallet Balance</span>
-            <strong>₹2,45,600</strong>
+         <strong>
+  ₹{Number(walletSummary.AvailableBalance || 0).toLocaleString()}
+</strong>
           </div>
 
           <div className="wallet-info-row">
             <span>Last Settlement</span>
-            <strong>₹48,250</strong>
+            <strong>
+  ₹{Number(walletOverview?.LastSettlement || 0).toLocaleString()}
+</strong>
           </div>
 
           <div className="wallet-info-row">
             <span>Settlement Date</span>
-            <strong>27 May 2024</strong>
+            <strong>
+{
+  walletOverview.LastSettlementDate
+    ? new Date(walletOverview?.LastSettlementDate)
+      .toLocaleDateString()
+    : "-"
+}
+</strong>
           </div>
 
           <div className="wallet-info-row">
@@ -74,25 +249,7 @@ const WalletsAndPayouts = () => {
         <div className="actve-vndr-dtl-wallet-box">
 
           <h3>Earnings Breakdown</h3>
-
-          <div className="wallet-info-row">
-            <span>Product Sales</span>
-            <strong>₹3,85,500</strong>
-          </div>
-
-          <div className="wallet-info-row">
-            <span>Delivery Charges</span>
-            <strong>₹12,500</strong>
-          </div>
-
-          <div className="wallet-info-row">
-            <span>Promotional Revenue</span>
-            <strong>₹8,000</strong>
-          </div>
-
-          <div className="wallet-total-green">
-            Total Earnings ₹4,06,100
-          </div>
+         
 
         </div>
 
@@ -100,29 +257,31 @@ const WalletsAndPayouts = () => {
 
           <h3>Deductions</h3>
 
-          <div className="wallet-info-row">
-            <span>Platform Commission</span>
-            <strong>₹58,200</strong>
-          </div>
+         <div className="wallet-info-row">
+  <span>Total Revenue</span>
+  <strong>
+    ₹{Number(walletSummary.TotalRevenue || 0).toLocaleString()}
+  </strong>
+</div>
 
-          <div className="wallet-info-row">
-            <span>Refunds</span>
-            <strong>₹6,500</strong>
-          </div>
+<div className="wallet-info-row">
+  <span>Platform Commission (40%)</span>
+  <strong>
+    ₹{Number(walletSummary.TotalCommission || 0).toLocaleString()}
+  </strong>
+</div>
 
-          <div className="wallet-info-row">
-            <span>Promotions</span>
-            <strong>₹2,300</strong>
-          </div>
+<div className="wallet-info-row">
+  <span>Net Vendor Earnings</span>
+  <strong>
+    ₹{Number(walletSummary.TotalNetEarnings || 0).toLocaleString()}
+  </strong>
+</div>
 
-          <div className="wallet-info-row">
-            <span>Taxes</span>
-            <strong>₹18,000</strong>
-          </div>
-
-          <div className="wallet-total-red">
-            Total Deductions ₹85,000
-          </div>
+<div className="wallet-total-green">
+  Available Balance ₹
+  {Number(walletSummary.AvailableBalance || 0).toLocaleString()}
+</div>
 
         </div>
 
@@ -179,28 +338,41 @@ const WalletsAndPayouts = () => {
 
             <tbody>
 
-              <tr>
-                <td>PAY-2024-231</td>
-                <td>27 May 2024</td>
-                <td>₹48,250</td>
-                <td>Completed</td>
-              </tr>
+{
+  payoutHistory.map(
+    (item:any,index:number)=>(
+      <tr key={index}>
 
-              <tr>
-                <td>PAY-2024-228</td>
-                <td>20 May 2024</td>
-                <td>₹45,800</td>
-                <td>Completed</td>
-              </tr>
+        <td>
+          {item.PayoutID}
+        </td>
 
-              <tr>
-                <td>PAY-2024-224</td>
-                <td>13 May 2024</td>
-                <td>₹42,900</td>
-                <td>Completed</td>
-              </tr>
+        <td>
+          {
+            item.PayoutDate
+              ? new Date(item.PayoutDate)
+                .toLocaleDateString()
+              : "-"
+          }
+        </td>
 
-            </tbody>
+        <td>
+          ₹{
+            Number(item.NetAmount || 0)
+              .toLocaleString()
+          }
+        </td>
+
+        <td>
+          {item.PayoutStatus}
+        </td>
+
+      </tr>
+    )
+  )
+}
+
+</tbody>
 
           </table>
 
@@ -238,15 +410,15 @@ const WalletsAndPayouts = () => {
 
             <h3>Settlement Controls</h3>
 
-            <button className="wallet-btn green">
+            <button className="wallet-btn green"  onClick={releasePayment}>
               Release Payment
             </button>
 
-            <button className="wallet-btn yellow">
+            <button className="wallet-btn yellow"  onClick={holdSettlement}>
               Hold Settlement
             </button>
 
-            <button className="wallet-btn red">
+            <button className="wallet-btn red"  onClick={freezeWallet}>
               Freeze Wallet
             </button>
 
