@@ -197,6 +197,11 @@ navigate("/vendorapplications")
 
           </div>
 
+           <div className="vendor-sidebar-item" onClick={()=>navigate('/AdminCustomers')}>
+            <i className="fa-solid fa-user"></i>
+            <span>Customers</span>
+           </div>
+
 
           <div className="vendor-sidebar-item">
 
@@ -226,12 +231,7 @@ navigate("/vendorapplications")
 
           </div>
 
-          <div className="vendor-sidebar-item">
-
-            <i className="fa-solid fa-user"></i>
-            <span>Customers</span>
-
-          </div>
+         
 
 
           {/* Reports */}

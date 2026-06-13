@@ -4898,17 +4898,17 @@ app.get("/api/admin/orders", async (req, res) => {
 //         u.Email,
 //         u.ContactNo,
 //         u.Status,
-//         u.CreatedDt,
-//         o.OrderDate,
+//         u.CreatedDt ,
+//         o.OrderDate
 //       FROM UserMaster u
 //       LEFT JOIN (
 //           SELECT UserID, 
-//                  MAX(OrderDate) AS OrderDate,
+//                  MAX(OrderDate) AS OrderDate
 //           FROM OrderMaster
 //           GROUP BY UserID
 //       ) o ON u.UserID = o.UserID
 //       WHERE u.RoleID = 5
-//       ORDER BY o.CreatedDt DESC
+//       ORDER BY u.CreatedDt DESC
 //     `);
 
 //     res.json({
@@ -4924,25 +4924,53 @@ app.get("/api/admin/orders", async (req, res) => {
 
 app.get("/api/admin/customers", async (req, res) => {
   try {
+
     const result = await new sql.Request().query(`
-      SELECT 
+
+      SELECT
+
         u.UserID,
         u.FirstName,
         u.LastName,
         u.Email,
         u.ContactNo,
-        u.Status,
-        u.CreatedDt ,
-        o.OrderDate
+        u.CreatedDt,
+
+        COUNT(o.OrderID) AS OrdersPlaced,
+
+        ISNULL(SUM(o.TotalAmount),0) AS TotalSpent,
+
+        MAX(o.OrderDate) AS LastOrderDate,
+
+        CASE
+          WHEN COUNT(o.OrderID) > 0
+          THEN 'Active'
+          ELSE 'Inactive'
+        END AS CustomerStatus
+
       FROM UserMaster u
-      LEFT JOIN (
-          SELECT UserID, 
-                 MAX(OrderDate) AS OrderDate
-          FROM OrderMaster
-          GROUP BY UserID
-      ) o ON u.UserID = o.UserID
-      WHERE u.RoleID = 5
-      ORDER BY u.CreatedDt DESC
+
+      LEFT JOIN OrderMaster o
+        ON u.UserID = o.UserID
+
+      WHERE EXISTS
+      (
+        SELECT 1
+        FROM OrderMaster om
+        WHERE om.UserID = u.UserID
+      )
+
+      GROUP BY
+
+        u.UserID,
+        u.FirstName,
+        u.LastName,
+        u.Email,
+        u.ContactNo,
+        u.CreatedDt
+
+      ORDER BY MAX(o.OrderDate) DESC
+
     `);
 
     res.json({
@@ -4951,62 +4979,114 @@ app.get("/api/admin/customers", async (req, res) => {
     });
 
   } catch (err) {
+
     console.error("❌ CUSTOMER API ERROR:", err);
-    res.status(500).json({ success: false });
+
+    res.status(500).json({
+      success: false,
+      message: err.message
+    });
+
   }
 });
 
-// app.get("/api/cart/recommendations/:userId", async (req, res) => {
-//   try {
-//     const { userId } = req.params;
 
-//     const result = await new sql.Request()
-//       .input("UserID", sql.Int, userId)
-//       .query(`
-//         SELECT 
-//           pm.ProductID,
-//           pm.ProductName,
-//           pm.ProductDescription,
-//           pm.ProductWeight,
-//           ISNULL(ppm.Price, 0) AS Price,
-//           ISNULL(ppm.DiscountPrice, 0) AS DiscountPrice,
-//           a.AttachmentFile AS ProductImage
-//         FROM Cart c
+app.get("/api/admin/customer-dashboard", async (req, res) => {
 
-//         INNER JOIN ProductMaster cartPm
-//           ON c.ProductID = cartPm.ProductID
+  try {
 
-//         INNER JOIN ProductMaster pm
-//           ON pm.ProductCategoryID = cartPm.ProductCategoryID
+    const result = await sql.query(`
 
-//         LEFT JOIN ProductPriceMaster ppm
-//           ON pm.ProductID = ppm.ProductID
+      SELECT
 
-//         LEFT JOIN Attachments a
-//           ON pm.ProductID = a.ProductID
-//           AND a.SortOrder = 1
+        COUNT(DISTINCT UserID)
+        AS TotalCustomers,
 
-//         WHERE c.UserID = @UserID
-//           AND pm.ProductID NOT IN (
-//               SELECT ProductID 
-//               FROM Cart
-//               WHERE UserID = @UserID
-//           )
-//           AND pm.Status = 1
+        COUNT(OrderID)
+        AS OrdersPlaced,
 
-//         ORDER BY pm.CreatedDt DESC
-//       `);
+        ISNULL(SUM(TotalAmount),0)
+        AS TotalRevenue,
 
-//     res.json(result.recordset);
+        COUNT(
+          CASE
+            WHEN MONTH(OrderDate)=MONTH(GETDATE())
+            AND YEAR(OrderDate)=YEAR(GETDATE())
+            THEN 1
+          END
+        ) AS NewThisMonth
 
-//   } catch (err) {
-//     console.error("❌ Recommendation API Error:", err);
-//     res.status(500).json({
-//       message: "Failed to load recommendations",
-//       error: err.message
-//     });
-//   }
-// });
+      FROM OrderMaster
+
+    `);
+
+    res.json({
+      success:true,
+      data:result.recordset[0]
+    });
+
+  } catch(error){
+
+    res.status(500).json({
+      success:false,
+      message:error.message
+    });
+
+  }
+
+});
+
+app.get("/api/cart/recommendations/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const result = await new sql.Request()
+      .input("UserID", sql.Int, userId)
+      .query(`
+        SELECT 
+          pm.ProductID,
+          pm.ProductName,
+          pm.ProductDescription,
+          pm.ProductWeight,
+          ISNULL(ppm.Price, 0) AS Price,
+          ISNULL(ppm.DiscountPrice, 0) AS DiscountPrice,
+          a.AttachmentFile AS ProductImage
+        FROM Cart c
+
+        INNER JOIN ProductMaster cartPm
+          ON c.ProductID = cartPm.ProductID
+
+        INNER JOIN ProductMaster pm
+          ON pm.ProductCategoryID = cartPm.ProductCategoryID
+
+        LEFT JOIN ProductPriceMaster ppm
+          ON pm.ProductID = ppm.ProductID
+
+        LEFT JOIN Attachments a
+          ON pm.ProductID = a.ProductID
+          AND a.SortOrder = 1
+
+        WHERE c.UserID = @UserID
+          AND pm.ProductID NOT IN (
+              SELECT ProductID 
+              FROM Cart
+              WHERE UserID = @UserID
+          )
+          AND pm.Status = 1
+
+        ORDER BY pm.CreatedDt DESC
+      `);
+
+    res.json(result.recordset);
+
+  } catch (err) {
+    console.error("❌ Recommendation API Error:", err);
+    res.status(500).json({
+      message: "Failed to load recommendations",
+      error: err.message
+    });
+  }
+});
 
 app.get("/api/cart/recommendations/:userId", async (req, res) => {
   try {
@@ -7391,55 +7471,165 @@ app.get("/api/admin/vendor-loss-products/:vendorId", async (req,res)=>{
 //wallets 
 
 
-app.get("/api/admin/vendor-wallet-summary/:vendorId", async(req,res)=>{
+// app.get("/api/admin/vendor-wallet-summary/:vendorId", async(req,res)=>{
 
-  try{
+//   try{
 
-    const vendorId=req.params.vendorId;
+//     const vendorId=req.params.vendorId;
 
-    const result=await sql.query(`
+//     const result=await sql.query(`
+
+//       SELECT
+
+//       ISNULL(R.TotalRevenue,0) TotalRevenue,
+
+//       ISNULL(R.TotalRevenue * 0.40,0) TotalCommission,
+
+//       ISNULL(R.TotalRevenue * 0.60,0) TotalNetEarnings,
+
+//       ISNULL(P.TotalPaidOut,0) TotalPaidOut,
+
+//       (
+//         ISNULL(R.TotalRevenue * 0.60,0)
+//         -
+//         ISNULL(P.TotalPaidOut,0)
+//       ) AvailableBalance,
+
+//       (
+//         ISNULL(R.TotalRevenue * 0.60,0)
+//         -
+//         ISNULL(P.TotalPaidOut,0)
+//       ) PendingSettlement,
+
+//       ISNULL(R.ThisMonthRevenue,0)
+//       AS ThisMonthEarnings
+
+//       FROM
+
+//       (
+
+//         SELECT
+
+//         SUM(TotalPrice) TotalRevenue,
+
+//         SUM(
+//           CASE
+//             WHEN MONTH(CreatedDt)=MONTH(GETDATE())
+//             AND YEAR(CreatedDt)=YEAR(GETDATE())
+//             THEN TotalPrice
+//             ELSE 0
+//           END
+//         ) ThisMonthRevenue
+
+//         FROM OrderDetails
+
+//         WHERE VendorID=${vendorId}
+
+//       ) R
+
+//       CROSS JOIN
+
+//       (
+
+//         SELECT
+
+//         ISNULL(SUM(NetAmount),0)
+//         AS TotalPaidOut
+
+//         FROM VendorPayouts
+
+//         WHERE VendorID=${vendorId}
+//         AND PayoutStatus='Completed'
+
+//       ) P
+
+//     `);
+
+//     res.json({
+//       success:true,
+//       data:result.recordset[0]
+//     });
+
+//   }
+//   catch(error){
+
+//     res.status(500).json({
+//       success:false,
+//       message:error.message
+//     });
+
+//   }
+
+// });
+
+app.get("/api/admin/vendor-wallet-summary/:vendorId", async (req, res) => {
+
+  try {
+
+    const vendorId = req.params.vendorId;
+
+    const result = await sql.query(`
 
       SELECT
 
-      ISNULL(R.TotalRevenue,0) TotalRevenue,
+      ISNULL(R.TotalRevenue,0) AS TotalRevenue,
 
-      ISNULL(R.TotalRevenue * 0.40,0) TotalCommission,
+      ISNULL(R.TotalRevenue * 0.40,0) AS TotalCommission,
 
-      ISNULL(R.TotalRevenue * 0.60,0) TotalNetEarnings,
+      ISNULL(R.TotalRevenue * 0.60,0) AS TotalNetEarnings,
 
-      ISNULL(P.TotalPaidOut,0) TotalPaidOut,
+      ISNULL(P.TotalPaidOut,0) AS TotalPaidOut,
 
-      (
-        ISNULL(R.TotalRevenue * 0.60,0)
-        -
-        ISNULL(P.TotalPaidOut,0)
-      ) AvailableBalance,
+      CASE
+        WHEN
+        (
+          ISNULL(R.TotalRevenue * 0.60,0)
+          -
+          ISNULL(P.TotalPaidOut,0)
+        ) < 0
+        THEN 0
+        ELSE
+        (
+          ISNULL(R.TotalRevenue * 0.60,0)
+          -
+          ISNULL(P.TotalPaidOut,0)
+        )
+      END AS AvailableBalance,
 
-      (
-        ISNULL(R.TotalRevenue * 0.60,0)
-        -
-        ISNULL(P.TotalPaidOut,0)
-      ) PendingSettlement,
+      CASE
+        WHEN
+        (
+          ISNULL(R.TotalRevenue * 0.60,0)
+          -
+          ISNULL(P.TotalPaidOut,0)
+        ) < 0
+        THEN 0
+        ELSE
+        (
+          ISNULL(R.TotalRevenue * 0.60,0)
+          -
+          ISNULL(P.TotalPaidOut,0)
+        )
+      END AS PendingSettlement,
 
-      ISNULL(R.ThisMonthRevenue,0)
+      ISNULL(R.ThisMonthRevenue * 0.60,0)
       AS ThisMonthEarnings
 
       FROM
 
       (
-
         SELECT
 
-        SUM(TotalPrice) TotalRevenue,
+        ISNULL(SUM(TotalPrice),0) AS TotalRevenue,
 
-        SUM(
+        ISNULL(SUM(
           CASE
             WHEN MONTH(CreatedDt)=MONTH(GETDATE())
             AND YEAR(CreatedDt)=YEAR(GETDATE())
             THEN TotalPrice
             ELSE 0
           END
-        ) ThisMonthRevenue
+        ),0) AS ThisMonthRevenue
 
         FROM OrderDetails
 
@@ -7450,7 +7640,6 @@ app.get("/api/admin/vendor-wallet-summary/:vendorId", async(req,res)=>{
       CROSS JOIN
 
       (
-
         SELECT
 
         ISNULL(SUM(NetAmount),0)
@@ -7481,6 +7670,7 @@ app.get("/api/admin/vendor-wallet-summary/:vendorId", async(req,res)=>{
   }
 
 });
+
 
 app.get("/api/admin/vendor-wallet-overview/:vendorId", async(req,res)=>{
 
@@ -7604,32 +7794,124 @@ app.get("/api/admin/vendor-deductions/:vendorId", async(req,res)=>{
 
 });
 
-app.post("/api/admin/release-vendor-payment/:vendorId", async (req, res) => {
+// app.post("/api/admin/release-vendor-payment/:vendorId", async (req, res) => {
+//   try {
+
+//     const vendorId = req.params.vendorId;
+
+//     // Get vendor wallet balance
+//     const walletData = await sql.query(`
+
+//       SELECT
+//         ISNULL(SUM(TotalPrice),0) AS WalletBalance
+//       FROM OrderDetails
+//       WHERE VendorID = ${vendorId}
+
+//     `);
+
+//     const grossAmount =
+//       Number(walletData.recordset[0].WalletBalance || 0);
+
+//     if (grossAmount <= 0) {
+
+//       return res.json({
+//         success: false,
+//         message: "No balance available for settlement"
+//       });
+
+//     }
+
+//     const commissionPercentage = 40;
+
+//     const commissionAmount =
+//       grossAmount * (commissionPercentage / 100);
+
+//     const netAmount =
+//       grossAmount - commissionAmount;
+
+//     await sql.query(`
+
+//       INSERT INTO VendorPayouts
+//       (
+//         VendorID,
+//         GrossAmount,
+//         CommissionPercentage,
+//         CommissionAmount,
+//         NetAmount,
+//         PayoutStatus,
+//         PayoutDate,
+//         CreatedDt
+//       )
+//       VALUES
+//       (
+//         ${vendorId},
+//         ${grossAmount},
+//         ${commissionPercentage},
+//         ${commissionAmount},
+//         ${netAmount},
+//         'Completed',
+//         GETDATE(),
+//         GETDATE()
+//       )
+
+//     `);
+
+//     res.json({
+//       success: true,
+//       message: "Payment Released Successfully"
+//     });
+
+//   }
+//   catch (error) {
+
+//     res.status(500).json({
+//       success: false,
+//       message: error.message
+//     });
+
+//   }
+// });
+
+app.post("/api/admin/release-vendor-payment/:vendorId", async (req,res) => {
+
   try {
 
     const vendorId = req.params.vendorId;
 
-    // Get vendor wallet balance
-    const walletData = await sql.query(`
+    const balanceData = await sql.query(`
 
       SELECT
-        ISNULL(SUM(TotalPrice),0) AS WalletBalance
+
+      (
+        ISNULL(SUM(TotalPrice),0) * 0.60
+      )
+      -
+      (
+        SELECT ISNULL(SUM(NetAmount),0)
+        FROM VendorPayouts
+        WHERE VendorID=${vendorId}
+        AND PayoutStatus='Completed'
+      ) AS AvailableBalance
+
       FROM OrderDetails
-      WHERE VendorID = ${vendorId}
+
+      WHERE VendorID=${vendorId}
 
     `);
 
-    const grossAmount =
-      Number(walletData.recordset[0].WalletBalance || 0);
+    const availableBalance =
+      Number(balanceData.recordset[0].AvailableBalance || 0);
 
-    if (grossAmount <= 0) {
+    if (availableBalance <= 0) {
 
       return res.json({
-        success: false,
-        message: "No balance available for settlement"
+        success:false,
+        message:"No amount available in wallet to release"
       });
 
     }
+
+    const grossAmount = availableBalance;
 
     const commissionPercentage = 40;
 
@@ -7667,19 +7949,20 @@ app.post("/api/admin/release-vendor-payment/:vendorId", async (req, res) => {
     `);
 
     res.json({
-      success: true,
-      message: "Payment Released Successfully"
+      success:true,
+      message:"Payment Released Successfully"
     });
 
   }
-  catch (error) {
+  catch(error){
 
     res.status(500).json({
-      success: false,
-      message: error.message
+      success:false,
+      message:error.message
     });
 
   }
+
 });
 app.post("/api/admin/hold-settlement/:vendorId", async(req,res)=>{
 
